@@ -37,6 +37,7 @@ The script `1-simulate_with_PBD_bioclust.R` generates several output files:
 
 The script `2-tidy_inferences.py` generates the output:
 * `all_simulations_inference.csv` a csv file summarizing all the replicates.
+* `summary_all_MCMC.csv` a csv file summarizing all the rates (mean, median, sd, ...) inferred accross the MCMC chain and accross the replicates.
 
 ## Runs 
 On the cluster (only once)
