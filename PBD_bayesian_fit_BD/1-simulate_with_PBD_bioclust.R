@@ -31,7 +31,7 @@ param_ranges <- list( # All values tested for each parameter
   10^(seq(from = -1, to = 1, length.out = param_n))
 )
 
-age <- 5 # Duration simulations
+age <- 10 # Duration simulations
 
 i_tree <- as.numeric(args_input[1])
 print(i_tree)
