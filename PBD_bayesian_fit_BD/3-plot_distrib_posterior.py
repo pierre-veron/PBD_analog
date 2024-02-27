@@ -16,7 +16,7 @@ colors = ["#" + x for x in ["000000","cf5c36","bcd696","985f99","9684a1"]]
 
 
 # Load the results of the inference
-outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12038"
+outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12149"
 
 simul_infer = pd.read_csv(outdir + "/all_simulations_inference.csv")
 simul_infer["combinaison"] = 10*simul_infer.param_vary + simul_infer.i_param_var
