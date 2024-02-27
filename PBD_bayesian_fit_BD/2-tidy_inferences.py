@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 
 
-outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12038"
-n_replicates = 100
+outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12149"
+n_replicates = 200
 
 list_df = []
 

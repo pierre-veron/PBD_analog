@@ -62,3 +62,5 @@ python ./3-plot_distrib_posterior.py
 ## History
 * 2024/02/21 run 100 replicates with cluster id `12038`. 
 Changed the values taken by $\lambda_3$ because too high values did not run (large trees).
+
+* 2024/02/27 run 200 replicates with larger tree size (`age = 8`) and smaller rage of the rate of initiation. Cluster id `12149`, Git version `c4c04d6`. 
