@@ -24,14 +24,14 @@ library(diversitree)
 param_default <- c(0.5, 1.0, 0.4, 0.2, 0.2) # PBD parameters 
 param_n <- 5 # Number of values tested for each parameter
 param_ranges <- list( # All values tested for each parameter
-  10^(seq(from = -1, to = 1, length.out = param_n)),
+  c(10^-1, 10^-0.5, 1.0, 10^0.25, 10^0.5),
   10^(seq(from = -1, to = 1, length.out = param_n)),
   c(10^-1, 10^-0.5, 1.0, 10^0.25, 10^0.5),
   10^(seq(from = -1, to = 1, length.out = param_n)),
   10^(seq(from = -1, to = 1, length.out = param_n))
 )
 
-age <- 10 # Duration simulations
+age <- 8 # Duration simulations
 
 i_tree <- as.numeric(args_input[1])
 print(i_tree)
@@ -40,7 +40,7 @@ set.seed(29 + 5 * i_tree)
 
 # Simulation and inference 
 simul_infer <- lapply(1:length(param_default), function(i_param) {
-  
+  print(paste0("Starting parameter ", i_param))
   param <- param_default
   
   as.data.frame(t(sapply(1:param_n, function(i_param_var) {

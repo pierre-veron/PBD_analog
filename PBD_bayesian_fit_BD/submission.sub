@@ -5,8 +5,8 @@ error = /data/biodiv/pveron/PBD_analog/out/$(Cluster).$(Process).error
 log = /data/biodiv/pveron/PBD_analog/out/$(Cluster).log
 
 request_cpus = 1
-request_memory = 10G
+request_memory = 5G
 
 accounting_group = LongJob.Weekly
 
-queue 100
+queue 200
