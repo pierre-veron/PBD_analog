@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
 
-
+# Adapt this section
 outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12149"
+two_tips_posterior = "two_tip_posterior/rootAge8.tsv"
 n_replicates = 200
+mcmc_size = 5000
 
 list_df = []
 
@@ -17,6 +19,9 @@ df.to_csv(outdir + "/all_simulations_inference.csv")
 print("Concatenated {} replicates.".format(n_replicates))
 
 
+# Load the posteriors for the 2-tips trees
+two_tips = pd.read_table(two_tips_posterior, sep = "\t")
+
 # Summarize all MCMCs
 burnin = 500
 n_param_var = int(max(df["i_param_var"]))
@@ -29,27 +34,31 @@ for i in range(len(par_names_PBD)):
     for i_param_var in range(1, 1+n_param_var):
 
         par_simul = (df.loc[(df.param_vary == i + 1) & (df.i_param_var == i_param_var) & (df.replicate == 1)]).to_dict("records")[0]
+        df_simul = df.loc[(df.param_vary == i + 1) & (df.i_param_var == i_param_var)]
         par_simul = {k:par_simul[k] for k in keys_keep}
 
         birth_all, death_all = [],[]
 
         # Load MCMC samples
-        n_trees_mcmc = 0
+        n_trees_non_trivial = 0
+
         for i_tree in range(n_replicates):
-            fname = "mcmc-par{}-var{}-rep{}.csv".format(i+1, i_param_var, i_tree+1)
-            try:
+            sr = list(df_simul.loc[df_simul.replicate == i_tree, "SR"])[0]
+            if sr > 2:
+                fname = "mcmc-par{}-var{}-rep{}.csv".format(i+1, i_param_var, i_tree)
                 samples = pd.read_csv(outdir + "/" + fname)
                 samples = samples.loc[burnin:]
-            except:
-                pass
+                n_trees_non_trivial += 1
             else:
-                n_trees_mcmc += 1
-                birth_all += list(samples["lambda"])
-                death_all += list(samples["mu"])
+                subsampling = np.random.choice(two_tips.index, size = mcmc_size - burnin, replace = False)
+                samples = two_tips.loc[subsampling]
+                
+            birth_all += list(samples["lambda"])
+            death_all += list(samples["mu"])
 
         birth_all, death_all = np.array(birth_all), np.array(death_all)
 
-        par_simul["n_trees_MCMC"] = n_trees_mcmc
+        par_simul["n_trees_non_trivial"] = n_trees_non_trivial
 
         par_simul["allMCMC.l.mean"] = np.mean(birth_all)
         par_simul["allMCMC.l.median"] = np.median(birth_all)
