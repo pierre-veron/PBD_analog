@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-
+from matplotlib.cbook import boxplot_stats
+import json
 # Adapt this section
 outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12149"
 two_tips_posterior = "two_tip_posterior/rootAge8.tsv"
@@ -57,44 +58,31 @@ for i in range(len(par_names_PBD)):
             death_all += list(samples["mu"])
 
         birth_all, death_all = np.array(birth_all), np.array(death_all)
-
-        par_simul["n_trees_non_trivial"] = n_trees_non_trivial
-
-        par_simul["allMCMC.l.mean"] = np.mean(birth_all)
-        par_simul["allMCMC.l.median"] = np.median(birth_all)
-        par_simul["allMCMC.l.sd"] = np.std(birth_all)
-        par_simul["allMCMC.l.q25"] = np.quantile(birth_all, 0.25)
-        par_simul["allMCMC.l.q75"] = np.quantile(birth_all, 0.75)
-        par_simul["allMCMC.l.min"] = np.min(birth_all)
-        par_simul["allMCMC.l.max"] = np.max(birth_all)
-
-        par_simul["allMCMC.mu.mean"] = np.mean(death_all)
-        par_simul["allMCMC.mu.median"] = np.median(death_all)
-        par_simul["allMCMC.mu.sd"] = np.std(death_all)
-        par_simul["allMCMC.mu.q25"] = np.quantile(death_all, 0.25)
-        par_simul["allMCMC.mu.q75"] = np.quantile(death_all, 0.75)
-        par_simul["allMCMC.mu.min"] = np.min(death_all)
-        par_simul["allMCMC.mu.max"] = np.max(death_all)
-
         div_all = birth_all - death_all
         turnov_all = death_all / birth_all
 
-        par_simul["allMCMC.div.mean"] = np.mean(div_all)
-        par_simul["allMCMC.div.median"] = np.median(div_all)
-        par_simul["allMCMC.div.sd"] = np.std(div_all)
-        par_simul["allMCMC.div.q25"] = np.quantile(div_all, 0.25)
-        par_simul["allMCMC.div.q75"] = np.quantile(div_all, 0.75)
-        par_simul["allMCMC.div.min"] = np.min(div_all)
-        par_simul["allMCMC.div.max"] = np.max(div_all)
+        # save statistics for all type of rate 
+        rate_names = ["l", "mu", "div", "turnov"]
+        rate_data = [birth_all, death_all, div_all, turnov_all]
+        par_simul["n_trees_non_trivial"] = n_trees_non_trivial
 
-        par_simul["allMCMC.turnov.mean"] = np.mean(turnov_all)
-        par_simul["allMCMC.turnov.median"] = np.median(turnov_all)
-        par_simul["allMCMC.turnov.sd"] = np.std(turnov_all)
-        par_simul["allMCMC.turnov.q25"] = np.quantile(turnov_all, 0.25)
-        par_simul["allMCMC.turnov.q75"] = np.quantile(turnov_all, 0.75)
-        par_simul["allMCMC.turnov.min"] = np.min(turnov_all)
-        par_simul["allMCMC.turnov.max"] = np.max(turnov_all)
+        for name, data in zip(rate_names, rate_data):
+            par_simul["allMCMC."+name+".mean"] = np.mean(data)
+            par_simul["allMCMC."+name+".median"] = np.median(data)
+            par_simul["allMCMC."+name+".sd"] = np.std(data)
+            par_simul["allMCMC."+name+".q25"] = np.quantile(data, 0.25)
+            par_simul["allMCMC."+name+".q75"] = np.quantile(data, 0.75)
+            par_simul["allMCMC."+name+".q025"] = np.quantile(data, 0.025)
+            par_simul["allMCMC."+name+".q975"] = np.quantile(data, 0.975)
+            par_simul["allMCMC."+name+".min"] = np.min(data)
+            par_simul["allMCMC."+name+".max"] = np.max(data)
 
+            # boxplot data 
+            box = boxplot_stats(data)[0]
+            box['fliers'] = list(box['fliers'])
+            with open(outdir + "/boxplot-"+name+"-par{}-var{}.json".format(i+1, i_param_var), 'w') as f: 
+                json.dump(box, f)
+        
         list_df.append(par_simul)
 
 df = pd.DataFrame(list_df)
