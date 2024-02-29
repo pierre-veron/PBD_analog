@@ -1,11 +1,11 @@
-# scripts to fit a birth-death model to trees simulated from the PBD model, with Bayesian approach
+# scripts to fit a constant-rate birth-death (CBD) model to trees simulated from the PBD model, with Bayesian approach
 ## Path
 ``` 
-PBD_bayesian_fit_BD
+PBD_bayesian_fit_CBD
 ```
 
 ## Overview
-These scripts generate trees under a PBD model and estimate BD rates on these trees 
+These scripts generate trees under a PBD model and estimate CBD rates on these trees 
 with Bayesian approach. 
 
 They are intended to be run on the cluster "bioclust". 
@@ -58,9 +58,13 @@ python ./2-tidy_inferences.py
 python ./3-plot_distrib_posterior.py
 ```
 
+## Specific case of trees with only two tips
+Among simulated reconstructed trees, diversitree does not allow CBD inference to be performed on those with only two tips. This analysis is therefore performed with the julia package Tapestree (branch [INSANE](https://github.com/ignacioq/Tapestree.jl/tree/insane)). The script and results can be found in the `INSANE_CBD_2tips_trees` directory, and the posterior parameters in `two_tip_posterior`.
 
 ## History
 * 2024/02/21 run 100 replicates with cluster id `12038`. 
 Changed the values taken by $\lambda_3$ because too high values did not run (large trees).
 
-* 2024/02/27 run 200 replicates with larger tree size (`age = 8`) and smaller rage of the rate of initiation. Cluster id `12149`, Git version `c4c04d6`. 
+* 2024/02/27 run 200 replicates with larger tree size (`age = 8`) and smaller rage of the rate of initiation. Cluster id `12149`, Git version `c4c04d6`.
+
+# 2024/02/28 run CBD inference with Tapestree.jl on two-tip trees of root age 8
