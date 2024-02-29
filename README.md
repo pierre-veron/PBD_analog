@@ -15,7 +15,6 @@ Test of the analog expressions of birth and death rates from the PBD model.
 * `PBD_bayesian_fit_CBD` : scripts to fit a constant-rate birth-death model to trees simulated from the PBD model, with Bayesian approach.
 * `PBD_bayesian_fit_BDD` : scripts to fit a heterogeneous-rate birth-death model to trees simulated from the PBD model, with Bayesian approach.
 * `fig` : figures of the project
-* `PBD_notebook.ipynb` : worksheet for the tests of the equivalent diverfication rates.
 * `modules/PBD_analog.py` : implementation of the equivalent birth-death rates from the PBD model and function to simulate a PBD process. 
 * `test_predictions`: test empirically the predictions derived from PBD model (without trees so far, only simple stochastic processes). 
 

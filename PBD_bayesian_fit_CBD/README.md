@@ -38,6 +38,7 @@ The script `1-simulate_with_PBD_bioclust.R` generates several output files:
 The script `2-tidy_inferences.py` generates the output:
 * `all_simulations_inference.csv` a csv file summarizing all the replicates.
 * `summary_all_MCMC.csv` a csv file summarizing all the rates (mean, median, sd, ...) inferred accross the MCMC chain and accross the replicates.
+* `boxplot-R-parX-varY.json` json files containing the data required to draw boxplots containing the BD rates for each values of each parameters (`R = l`, `mu`, `div` or `turnov`). See Matplotlib [doc](https://matplotlib.org/stable/api/cbook_api.html#matplotlib.cbook.boxplot_stats) for the syntax.
 
 ## Runs 
 On the cluster (only once)
@@ -67,4 +68,4 @@ Changed the values taken by $\lambda_3$ because too high values did not run (lar
 
 * 2024/02/27 run 200 replicates with larger tree size (`age = 8`) and smaller rage of the rate of initiation. Cluster id `12149`, Git version `c4c04d6`.
 
-# 2024/02/28 run CBD inference with Tapestree.jl on two-tip trees of root age 8
+* 2024/02/28 run CBD inference with Tapestree.jl on two-tip trees of root age 8
