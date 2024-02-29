@@ -1,11 +1,11 @@
-# scripts to fit a birth-death model to trees simulated from the PBD model, with Bayesian approach
+# scripts to fit a constant-rate birth-death (CBD) model to trees simulated from the PBD model, with Bayesian approach
 ## Path
 ``` 
 PBD_bayesian_fit_BD
 ```
 
 ## Overview
-These scripts generate trees under a PBD model and estimate BD rates on these trees 
+These scripts generate trees under a PBD model and estimate CBD rates on these trees 
 with Bayesian approach. 
 
 They are intended to be run on the cluster "bioclust". 
