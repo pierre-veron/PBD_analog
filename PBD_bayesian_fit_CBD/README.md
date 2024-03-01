@@ -60,7 +60,13 @@ python ./3-plot_distrib_posterior.py
 ```
 
 ## Specific case of trees with only two tips
-Among simulated reconstructed trees, diversitree does not allow CBD inference to be performed on those with only two tips. This analysis is therefore performed with the julia package Tapestree (branch [INSANE](https://github.com/ignacioq/Tapestree.jl/tree/insane)). The script and results can be found in the `INSANE_CBD_2tips_trees` directory, and the posterior parameters in `two_tip_posterior`.
+Among simulated reconstructed trees, diversitree does not allow CBD inference to be performed on those with only two tips. This analysis is therefore performed with the julia package Tapestree (branch [INSANE](https://github.com/ignacioq/Tapestree.jl/tree/insane)). The script and results can be found in the `INSANE_CBD_2tips_trees` directory, and the posterior parameters in `two_tip_posterior`. In `Julia`, run first:
+
+```
+using Pkg
+] add Tapestree#insane
+```
+Then run the script `INSANE_CBD_2tips_trees/TwoTipsTrees_CBD.jl`. 
 
 ## History
 * 2024/02/21 run 100 replicates with cluster id `12038`. 
