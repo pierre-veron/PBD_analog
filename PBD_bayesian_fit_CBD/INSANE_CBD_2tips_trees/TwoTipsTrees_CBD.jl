@@ -3,7 +3,7 @@ using Tapestree
 using Random: seed!
 using Plots
 
-root = 8
+root = 15
 tree = sT_label(sT_label(Float64(root), "t1"), sT_label(Float64(root), "t2"), 0.0, "")
 
 ## Sample a tree in the MCMC trace

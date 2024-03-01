@@ -4,8 +4,8 @@ from matplotlib.cbook import boxplot_stats
 import json
 
 # Adapt this section
-outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12149"
-two_tips_posterior = "INSANE_CBD_2tips_trees/outputs/CBD_2tips_50000000iter_rootAge8_seed0.log"
+outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12152"
+two_tips_posterior = "INSANE_CBD_2tips_trees/outputs/CBD_2tips_50000000iter_rootAge15_seed0.log"
 n_replicates = 200
 mcmc_size = 5000
 
