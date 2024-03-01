@@ -75,3 +75,7 @@ Changed the values taken by $\lambda_3$ because too high values did not run (lar
 * 2024/02/27 run 200 replicates with larger tree size (`age = 8`) and smaller rage of the rate of initiation. Cluster id `12149`, Git version `c4c04d6`.
 
 * 2024/02/28 run CBD inference with Tapestree.jl on two-tip trees of root age 8
+
+* 2024/03/01 Cluster id `12152`, Git version `6da9e79`:
+    *  run 200 replicates with larger tree size (`age = 15`).
+    *  run CBD inference with Tapestree.jl on two-tip trees of root age 15
