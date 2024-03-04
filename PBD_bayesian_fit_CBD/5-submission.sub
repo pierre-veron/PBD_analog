@@ -1,0 +1,12 @@
+executable = /users/biodiv/pveron/PBD_analog/5-wrapper.sh
+arguments = $(Process) /data/biodiv/pveron/PBD_analog/out
+output = /data/biodiv/pveron/PBD_analog/out/$(Cluster).$(Process).stdout
+error = /data/biodiv/pveron/PBD_analog/out/$(Cluster).$(Process).error
+log = /data/biodiv/pveron/PBD_analog/out/$(Cluster).log
+
+request_cpus = 1
+request_memory = 5G
+
+accounting_group = LongJob.Weekly
+
+queue 200
