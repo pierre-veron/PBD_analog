@@ -55,7 +55,7 @@ Rscript ./0-install_packages.R
 then 
 ```
 # on the cluster
-condor_submit submission.sub 
+condor_submit 1-submission.sub 
 ```
 
 Adapt the `2-` and `3-` Python scripts to specify where are stored the output and the number of replicates and run
