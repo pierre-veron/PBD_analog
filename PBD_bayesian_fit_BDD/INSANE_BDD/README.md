@@ -42,4 +42,4 @@ This will submit 1 job per line in `list_trees.txt`.
 No image or animation is generated since the corresponding lines in `1-ConstantPBDtrees_BDD.jl` is commented. 
 
 ## History
-* `2024/03/06` : Run with the reconstructed trees from cluster id `12183` with Git version `e24524c`. Cluster ID for this run = `12237`. 
+* `2024/03/06` : Run with the reconstructed trees from cluster id `12240` with Git version `6c42135`. Cluster ID for this run = `12237`. 
