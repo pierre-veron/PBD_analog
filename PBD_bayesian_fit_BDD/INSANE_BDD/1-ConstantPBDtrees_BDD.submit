@@ -8,13 +8,13 @@ error = /data/biodiv/pveron/PBD_analog/PBD_bayesian_fit_BDD/INSANE_BDD/Logs/BDD.
 log = /data/biodiv/pveron/PBD_analog/PBD_bayesian_fit_BDD/INSANE_BDD/Logs/BDD.$(Cluster).$(Process).log
 
 #3 - Describe the resources requirements of your job : 
-request_memory = 20GB
+request_memory = 2GB
 request_cpus = 1
 
 #4 - Submit your job
 arguments = /data/biodiv/pveron/PBD_analog/PBD_bayesian_fit_BDD/INSANE_BDD/1-ConstantPBDtrees_BDD.jl $(tree)
 
 # submit as a factory with an idle jobs limit
-concurrency_limits = pveron:134
+concurrency_limits = pveron:20
 
 queue tree from list_trees.txt
