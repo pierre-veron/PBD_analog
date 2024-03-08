@@ -19,3 +19,6 @@ The $\gamma$ statistics is a summary of the tree shape. If $\gamma > 0$, the int
 * `0-get_gamma.R` generates a table of the $\gamma$ statistics in `strees_stats.csv`
 * `1-simul_BD_get_gamma.R` generates the same table but for trees simulated under a BD model in `simulated_BD_trees_stats.csv`
 * `2-plot_gamma.ipynb` generates the table of statistical tests `Gamma_PBD_BD_MannWhitney_U_test.csv` and the figure with boxplots `CBD_gamma_vs_BD_gamma.pdf`. 
+
+## History 
+* `2024/03/08` run the pipeline for the output of the simulation with cluster ID `12152`, Git version `b2cb4e1`. 
