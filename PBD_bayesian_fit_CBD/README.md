@@ -28,6 +28,7 @@ Rscript ./1-simulate_with_PBD_bioclust.R 1 /data/biodiv/pveron/PBD_analog/out
 * `3-plot_distrib_posterior.py`: plot stacked posterior distributions of the inferred birth, death, diversification and turnover rate for each combination of parameters and compare it with the prediction. Generates figures in `fig/distrib_posterior` folder. 
 * `4-compare_predictions.ipynb`: plot the posterior distributions of the rates and compares them to the predictions. 
 * Files ending with `eq_init`: same analysis as for files `1-` to `4-`, but with $\lambda_1 = \lambda_3$. 
+* `8-gamma_tree_shape`: pipeline to get  $\gamma$ statistics on trees from PBD and compare to expected CBD trees. 
 
 ## Output 
 The scripts `1-simulate_with_PBD.R` and `5-simulate_PBD_eq_init.R` generate several output files:
