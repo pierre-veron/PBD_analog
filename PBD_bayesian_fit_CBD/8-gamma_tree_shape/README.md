@@ -22,3 +22,4 @@ The $\gamma$ statistics is a summary of the tree shape. If $\gamma > 0$, the int
 
 ## History 
 * `2024/03/08` run the pipeline for the output of the simulation with cluster ID `12152`, Git version `b2cb4e1`. 
+* `2024/03/08` new run of the pipeline for the output of the simulation with cluster ID `12152`, Git version `73567d2` (a seed has been set in the script `1-simul_BD_get_gamma.R`). 
