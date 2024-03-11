@@ -1,6 +1,9 @@
 library(ape)
 
-setwd("C:/Users/pveron/Output_clusters/PBD_analog/12152")
+setwd("C:/Users/pveron/Output_clusters/PBD_analog/12183")
+
+set.seed(95)
+
 age <- 15
 
 equivalent_bd_rates <- function(param) {
@@ -23,7 +26,16 @@ equivalent_bd_rates <- function(param) {
 simul_infer <- read.csv("all_simulations_inference.csv")
 
 param_PBD_names <-  paste0("PBD.", c("l1", "l2", "l3", "mu1", "mu2"))
-col_to_keep <- c("param_vary", "i_param_var", "replicate", param_PBD_names)
+
+
+# Case of simulations where only one parameter varies
+if ("param_vary" %in% colnames(simul_infer)) {
+  col_to_keep <- c("param_vary", "i_param_var", "replicate", param_PBD_names)
+} else {
+  col_to_keep <- c("i_param_var", "replicate", param_PBD_names)
+}
+
+
 
 
 tree_stats_df <- as.data.frame(t(sapply(rownames(simul_infer), function(rw) {
