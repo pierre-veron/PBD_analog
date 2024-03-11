@@ -11,9 +11,10 @@ The $\gamma$ statistics is a summary of the tree shape. If $\gamma > 0$, the int
 
 
 ## Files
-* `0-get_gamma.R`: parse the directory where the reconstructed trees from PBD simulation are stored and calculate their $\gamma$ statistics. 
+The files with `_eq_init` are for the simulations where $\lambda_1 = \lambda_3$. 
+* `0-get_gamma.R` and `0-get_gamma_eq_init.R`: parse the directory where the reconstructed trees from PBD simulation are stored and calculate their $\gamma$ statistics. 
 * `1-simul_BD_get_gamma.R`: simulate birth-death trees with the equivalent birth-death rates from the PBD parameters used in the simulations and calculate their $\gamma$ statistics.
-* `2-plot_gamma.ipynb`: plot the distributions of the $\gamma$ statistics from PBD trees _vs_ BD trees and compare them.
+* `2-plot_gamma.ipynb` and `2-plot_gamma_eq_init.ipynb`: plot the distributions of the $\gamma$ statistics from PBD trees _vs_ BD trees and compare them.
 
 ## Output 
 * `0-get_gamma.R` generates a table of the $\gamma$ statistics in `strees_stats.csv`
@@ -23,3 +24,4 @@ The $\gamma$ statistics is a summary of the tree shape. If $\gamma > 0$, the int
 ## History 
 * `2024/03/08` run the pipeline for the output of the simulation with cluster ID `12152`, Git version `b2cb4e1`. 
 * `2024/03/11` new run of the pipeline for the output of the simulation with cluster ID `12152`, Git version `73567d2` (a seed has been set in the script `1-simul_BD_get_gamma.R`). 
+* `2024/03/11`, run the pipeline for equal initiation rates, from the cluster ID `12183`, Git version `9a2244c`. 
