@@ -42,6 +42,8 @@ tree_stats_df <- as.data.frame(t(sapply(rownames(simul_infer), function(rw) {
   param_PBD <- unlist(simul_infer[rw, param_PBD_names])
   eq_bd <- equivalent_bd_rates(param_PBD)
   tree <- ape::rbdtree(eq_bd[1], eq_bd[2], age)
+  fname <- paste0("BD_tree_sim_", rw, "_b_", eq_bd[1], "_d_", eq_bd[2],  ".nwk")
+  ape::write.tree(tree, fname)
   c(unlist(simul_infer[rw, col_to_keep]),
     "gamma" = ape::gammaStat(tree),
     "SR" = length(tree$tip.label),
