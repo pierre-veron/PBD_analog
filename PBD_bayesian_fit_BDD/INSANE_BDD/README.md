@@ -13,7 +13,7 @@ PBD_bayesian_fit_BDD/INSANE_BDD
 * `Source_INSANE.jl`: build a custom version of Insane to cope with exponential priors
 
 ## Run 
-Clone the version of `Tapestree` on the cluster. 
+Clone the version of `Tapestree` [(branch `insane`)](https://github.com/Jeremy-Andreoletti/Tapestree.jl/tree/insane) on the cluster. 
 ```
 git clone -b insane https://github.com/Jeremy-Andreoletti/Tapestree.jl.git
 ```
@@ -42,4 +42,5 @@ This will submit 1 job per line in `list_trees.txt`.
 No image or animation is generated since the corresponding lines in `1-ConstantPBDtrees_BDD.jl` is commented. 
 
 ## History
-* `2024/03/06` : Run with the reconstructed trees from cluster id `12240` with Git version `6c42135`. Cluster ID for this run = `12237`. 
+* `2024/03/06` : Run with the reconstructed trees from cluster id `12152` with Git version `6c42135`. Cluster ID for this run = `12237` $\rightarrow$ *failed, too much memory*. 
+* `2024/03/14`: Run with the reconstructed trees from cluster id `12152` with Git version `1e1c6c3` (save less trees to gain memory). Cluster ID for this run = `12320`.
