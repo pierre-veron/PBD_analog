@@ -1,7 +1,7 @@
 # using Pkg; ]add Tapestree#insane
 #using Tapestree
 
-# Needs to use the custom INSANE build to set exponential priors
+# Needs to use the custom INSANE build to set gamma priors
 include(homedir()*"/Nextcloud/Recherche/1_Methods/INSANE/Source_INSANE.jl");
 
 using Random: seed!
@@ -27,7 +27,8 @@ shortMCMC = false
 niter    = veryShortMCMC ? 10 : (shortMCMC ? 50_000 : 20_000_000)
 nthin    = veryShortMCMC ? 1 : (shortMCMC ? 10 : 10_000)
 nburn    = veryShortMCMC ? 0 : (shortMCMC ? 1_000 : 1_000_000)
-nflush   = nthin
+nflushθ  = nthin
+nflushΞ  = Int64(ceil(niter/100))
 ofile    = "BDD_ConstantPBDtrees_$(niter)iter_seed$(tree_nb)"
 isdir("outputs/") || mkdir("outputs/")
 ϵi       = 0.2
@@ -55,7 +56,8 @@ seed!(tree_nb); insane_gbmbd(tree::sT_label,
                              niter    = niter,
                              nthin    = nthin,
                              nburn    = nburn,
-                             nflush   = nflush,
+                             nflushθ  = nflushθ,
+                             nflushΞ  = nflushΞ,
                              ofile    = "outputs/"*ofile,
                              ϵi       = ϵi,
                              λi       = λi,
@@ -83,8 +85,6 @@ anim_tree = @animate for tree_i in out_trees[ Integer.(round.(collect(range(1,le
 end
 mp4(anim_tree, "Animations/$(ofile)_anim_tree.mp4", fps=5)
 
-function explλ(x) return(exp.(lλ(x))) end
-function explμ(x) return(exp.(lμ(x))) end
 gr(dpi=400, size=(500,300))
 anim_tree = @animate for tree_i in out_trees[ Integer.(round.(collect(range(1,length(out_trees), 100))))]
   #plot(tree_i, explλ, clim=(0,1.0), shownodes=true, tip=true, speciation=true)
