@@ -11,7 +11,8 @@ using Plots
 ## Read in data
 tree_name = ARGS[1]
 #tree = read_newick("/data/biodiv/pveron/PBD_analog/trees12152/$(tree_name)")
-tree = read_newick("/Volumes/data/PBD_analog/trees12152/$(tree_name)")
+tree = read_newick("/data/biodiv/andreole/PBD_analog/trees12152/$(tree_name)")
+#tree = read_newick("/Volumes/data/PBD_analog/trees12152/$(tree_name)")
 
 ## Sample a tree in the MCMC trace
 seed_nb = rand(1:10000)
