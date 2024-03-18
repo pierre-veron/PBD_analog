@@ -2,14 +2,16 @@
 #using Tapestree
 
 # Needs to use the custom INSANE build to set gamma priors
-include("/data/biodiv/pveron/PBD_analog/PBD_bayesian_fit_BDD/INSANE_BDD/Source_INSANE.jl");
+#include("/data/biodiv/pveron/PBD_analog/PBD_bayesian_fit_BDD/INSANE_BDD/Source_INSANE.jl");
+include(homedir()*"/Nextcloud/Recherche/1_Methods/INSANE/Source_INSANE.jl");
 
 using Random: seed!
 using Plots
 
 ## Read in data
 tree_name = ARGS[1]
-tree = read_newick("/data/biodiv/pveron/PBD_analog/trees12152/$(tree_name)")
+#tree = read_newick("/data/biodiv/pveron/PBD_analog/trees12152/$(tree_name)")
+tree = read_newick("/Volumes/data/PBD_analog/trees12152/$(tree_name)")
 
 ## Sample a tree in the MCMC trace
 seed_nb = rand(1:10000)
@@ -23,12 +25,12 @@ shortMCMC = false
 λa_prior = (1.5, 1.0)
 μa_prior = (1.5, 1.0)
 α_prior  = (0.0, 1.0)
-σλ_prior = (3.0, 0.5)
-σμ_prior = (3.0, 0.5)
-niter    = veryShortMCMC ? 10 : (shortMCMC ? 50_000 : 20_000_000)
-nthin    = veryShortMCMC ? 1 : (shortMCMC ? 10 : 10_000)
-nburn    = veryShortMCMC ? 0 : (shortMCMC ? 1_000 : 1_000_000)
-nflushθ  = nthin
+σλ_prior = (5.0, 0.5)
+σμ_prior = (5.0, 0.5)
+niter    = veryShortMCMC ? 10 : (shortMCMC ? 50_000 : 2_000_000)
+nthin    = veryShortMCMC ? 1 : (shortMCMC ? niter+1 : niter+1)
+nburn    = veryShortMCMC ? 0 : (shortMCMC ? 1_000 : 100_000)
+nflushθ  = Int64(ceil(niter/20_000))
 nflushΞ  = Int64(ceil(niter/100))
 ofile    = "$(tree_name)-BDD_ConstantPBDtrees_$(niter)iter_seed$(seed_nb)"
 isdir("outputs/") || mkdir("outputs/")
@@ -75,7 +77,7 @@ seed!(seed_nb); insane_gbmbd(tree::sT_label,
                              stnμ     = stnμ,
                              tρ       = tρ)
 
-out_trees = iread("outputs/$(ofile).txt")[1:Int64(niter/nthin)]
+#out_trees = iread("outputs/$(ofile).txt")
 
 
 #ENV["GKSwstype"] = "nul"
