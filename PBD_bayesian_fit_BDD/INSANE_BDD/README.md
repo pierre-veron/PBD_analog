@@ -43,4 +43,5 @@ No image or animation is generated since the corresponding lines in `1-ConstantP
 
 ## History
 * `2024/03/06` : Run with the reconstructed trees from cluster id `12152` with Git version `6c42135`. Cluster ID for this run = `12237` $\rightarrow$ *failed, too much memory*. 
-* `2024/03/14`: Run with the reconstructed trees from cluster id `12152` with Git version `1e1c6c3` (save less trees to gain memory). Cluster ID for this run = `12320`.
+* `2024/03/14`: Run with the reconstructed trees from cluster id `12152` with Git version `1e1c6c3` (save less trees to gain memory). Cluster ID for this run = `12320` $\rightarrow$ *failed, numerical integration error, bug corrected on Tapestree*.
+* `2024/03/18`: Run with the reconstructed trees from cluster id `12152` with Git version `ac4d20c` (save less trees to gain memory). Cluster ID for this run = `12404`
