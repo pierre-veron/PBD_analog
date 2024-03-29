@@ -2,33 +2,40 @@
 
 import numpy as np
 
-def simul_prot_etienne(l1, l2, l3, m1, m2, n_g0, n_i0, n_sim = 10000, step = 100):
-    # dt : only for the Poisson approximation
+def simul_prot_etienne(l1, l2, l3, m1, m2, n_g0, n_i0, n_sim = 10000, step = 100, horizon = None):
     issues = ['GI', 'IG', 'II', 'GE', 'IE']
-    T, Speciation = np.zeros(n_sim), np.zeros(n_sim, dtype=bool)
-    T_mean, T_mean_spec,F_speciation = np.zeros(n_sim//step), np.zeros(n_sim//step), np.zeros(n_sim//step)
+    T, Speciation, Extinction = np.zeros(n_sim), np.zeros(n_sim, dtype=bool), np.zeros(n_sim, dtype = bool)
+    T_mean, T_mean_spec,F_speciation,F_extinction = np.zeros(n_sim//step), np.zeros(n_sim//step), np.zeros(n_sim//step),np.zeros(n_sim//step)
     Nb_direct_incipient = np.zeros(n_sim)
+    if horizon is None:
+        tmax = np.inf
+    else:
+        tmax = horizon
     for n in range(n_sim):
         n_g, n_i = (n_g0, n_i0)
         m = n_i
         t = 0
-        while (n_i + n_g > 0) and not(Speciation[n]):
+        while (n_i + n_g > 0) and not(Speciation[n]) and (t < tmax):
             rates = np.array([l1*n_g, l2 * n_i, l3 * n_i, m1 * n_g, m2*n_i])
             sum_rate = np.sum(rates)
             wait_time = np.random.exponential(1/sum_rate)
-            event = np.random.choice(issues, p=rates / sum_rate)
-            if event == 'GI' or event == 'II':
-                n_i += 1
-                m += int(event == 'GI')
-            elif event == 'IG':
-                n_i -= 1
-                n_g += 1
-                Speciation[n] = True
-            elif event == 'GE':
-                n_g -= 1
-            elif event == 'IE':
-                n_i -= 1
-            t += wait_time
+            if t + wait_time < tmax:
+                event = np.random.choice(issues, p=rates / sum_rate)
+                if event == 'GI' or event == 'II':
+                    n_i += 1
+                    m += int(event == 'GI')
+                elif event == 'IG':
+                    n_i -= 1
+                    n_g += 1
+                    Speciation[n] = True
+                elif event == 'GE':
+                    n_g -= 1
+                elif event == 'IE':
+                    n_i -= 1
+                t += wait_time
+            else:
+                t = tmax
+        Extinction[n] = (n_i + n_g == 0)
         T[n] = t
         Nb_direct_incipient[n] = m
         
@@ -36,8 +43,11 @@ def simul_prot_etienne(l1, l2, l3, m1, m2, n_g0, n_i0, n_sim = 10000, step = 100
             T_mean[n//step] = np.mean(T[0:n+1])
             T_mean_spec[n//step] = np.mean(T[Speciation])
             F_speciation[n//step] = np.sum(Speciation) / (n+1)
+            F_extinction[n//step] = np.sum(Extinction) / (n+1)
         
-    return T, Speciation, T_mean, T_mean_spec, F_speciation, Nb_direct_incipient
+    return dict(T = T, Speciation = Speciation, T_mean = T_mean, T_mean_spec = T_mean_spec, 
+                F_speciation = F_speciation, F_extinction = F_extinction, 
+                Nb_direct_incipient = Nb_direct_incipient, Extinction = Extinction)
 
 def pi(l1, l2, l3, m1, m2):
     pi_ = (l3 + m2 + l2)/(2*l3) * (1- np.sqrt(1 - 4 * m2 * l3 / ((l3 + m2 + l2)**2))) + np.zeros_like(l1)*np.zeros_like(m1) 
