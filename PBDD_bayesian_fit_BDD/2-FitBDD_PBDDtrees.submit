@@ -1,0 +1,22 @@
+#1 - Describe the name of your executable, and the optional arguments
+executable = /usr/local/bin/julia
+universe = vanilla
+accounting_group = LongJob.Weekly
+
+#2 - Describe the name of the files where the stdout, stderr and log of your job should get redirected:
+error = /data/biodiv/andreole/PBD_analog/PBDD_bayesian_fit_BDD/Logs/BDD.$(Cluster).$(Process).stderr
+log = /data/biodiv/andreole/PBD_analog/PBDD_bayesian_fit_BDD/Logs/BDD.$(Cluster).$(Process).log
+
+#3 - Describe the resources requirements of your job : 
+request_memory = 5GB
+request_cpus = 1
+
+#4 - Submit your job
+arguments = /data/biodiv/andreole/PBD_analog/PBDD_bayesian_fit_BDD/2-FitBDD_PBDDtrees.jl $(i)
+
+# submit as a factory with an idle jobs limit
+#concurrency_limits = andreole:20
+
+queue i from seq 1 50 |
+#i = 1
+#queue
