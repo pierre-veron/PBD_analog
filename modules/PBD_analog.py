@@ -1,6 +1,7 @@
 # Implements the PBD analogy and simulations 
 
 import numpy as np
+import scipy 
 
 def simul_prot_etienne(l1, l2, l3, m1, m2, n_g0, n_i0, n_sim = 10000, step = 100, horizon = None):
     issues = ['GI', 'IG', 'II', 'GE', 'IE']
@@ -49,6 +50,7 @@ def simul_prot_etienne(l1, l2, l3, m1, m2, n_g0, n_i0, n_sim = 10000, step = 100
                 F_speciation = F_speciation, F_extinction = F_extinction, 
                 Nb_direct_incipient = Nb_direct_incipient, Extinction = Extinction)
 
+# ---- Constant BD rates and infinite-time probabilities ---- # 
 def pi(l1, l2, l3, m1, m2):
     pi_ = (l3 + m2 + l2)/(2*l3) * (1- np.sqrt(1 - 4 * m2 * l3 / ((l3 + m2 + l2)**2))) + np.zeros_like(l1)*np.zeros_like(m1) 
     if type(pi_) == np.ndarray:
@@ -78,12 +80,179 @@ def tau_pdf(t, l1, l2, l3, m1, m2):
     phi_ = phi(l1, l2, l3, m1, m2)
     return 2 * D_**2 * np.exp(-D_ * t) * (D_ + phi_) / ((D_ + phi_ + np.exp(-D_ * t) * (D_-phi_))**2) 
 
-def approx_expected_T(l1, l2, l3, m1, m2):
+def approx_expected_T(l1, l2, l3, m1, m2, branch_at_initiation = False):
+    if branch_at_initiation:
+        return 1/((1-pi(l1, l2, l3, m1, m2)) * l1 + m1)
     return 1/((1-pi(l1, l2, l3, m1, m2)) * l1 + m1) + tau(l1, l2, l3, m1, m2)
 
-def analog_BD_rates(l1, l2, l3, m1, m2):
+def analog_BD_rates(l1, l2, l3, m1, m2, branch_at_initiation = False):
     p_speciation_ = p_speciation(l1, l2, l3, m1, m2)
-    approx_expected_T_ = approx_expected_T(l1, l2, l3, m1, m2)
+    approx_expected_T_ = approx_expected_T(l1, l2, l3, m1, m2, branch_at_initiation)
     spe_rate_ = p_speciation_ / approx_expected_T_
     ext_rate_ = (1-p_speciation_) / approx_expected_T_
     return spe_rate_, ext_rate_
+
+# ---- Time-dependant BD rates ---- #
+
+# Numerically calculate the probabilities of extinction/completion/speciation
+# pIE : probability of extinction of an incipient species within a time t
+# pIG : probability of extinction of a good species within a time t
+# pIC : probability of completion of an incipient species within a time t
+# pGS : probability of speciation from a good species within a time t
+
+# Define the ODEs to be solved (after the log transformation)
+def ODE_pGE_log(x, y, l1, l2, l3, m1, m2):
+    Theta = l1 + m1
+    return pIE_sol(np.log(x) / Theta, l1, l2, l3, m1, m2) * (m1  / Theta * (1-1/x) + l1*y/(Theta*x))
+
+def ODE_pIC_log(x, y, l1, l2, l3, m1, m2):
+    Lambda = l2 + l3 + m2
+    return (m2 / Lambda * (1-1/x) + 1/x * (1+l3/Lambda * y))**2
+
+def ODE_pGS_log(x, y, T, pIC, l1, l2, l3, m1, m2):
+    Theta = l1 + m1
+    t = np.log(x) / Theta
+    pIC_t = np.interp(t, T, pIC)
+    return pIC_t + (1-pIC_t) * l1 * y / (Theta * x)
+
+def pIE_sol(T, l1, l2, l3, m1, m2):
+    """ Calculate the exact probability of extinction of an incipient species 
+        before a time T. 
+
+    Args:
+        T (float or array-like): time horizon (must be non negative)
+        l1, l2, l3, m2, m2 (float): parameters of the PBD model
+
+    Returns:
+        float or array-like: pIE(T)
+    """
+    if type(T) == list:
+        T = np.array(T)
+    
+    l = l2 + l3 + m2
+    a = m2
+    b = l3
+    k = np.sqrt(l**2 - 4*a*b)
+    c1 = 2.0/(k-l) - 1/k
+    etk = np.exp(T * k)
+    num = c1 * etk * (l-k) + l/k
+    den = np.power(c1 * etk + 1/k, 2)
+    pIE =  1/b * np.sqrt(num/den - 0.5*(l*(k-l) + 2*a*b))
+    if type(T) == np.ndarray: # if T = 0, proba is zero
+        pIE[T == 0.0] = 0.0
+    elif T == 0.0:
+        pIE = 0.0
+    return pIE
+
+def PBD_to_probs(T, l1, l2, l3, m1, m2, solver_method = "BDF", 
+                 solver_kwargs = dict(atol = 1e-6, rtol = 1e-9)):
+    """ Calculate the probabilities of extinction/speciation/completion before a 
+        time T in the PBD model.
+
+    Args:
+        T (array): time horizons, must be sorted and T[0] must be 0.
+        l1, l2, l3, m2, m2 (float): parameters of the PBD model
+        solver_method (str or Solver, optional): method used by solver. Must be 
+           accepted by scipy.integrate.solve_ivp. Defaults to "BDF".
+        solver_kwargs (dict, optional): other kwargs passed to the ODE solver, 
+           in particular relative and absolute tolerances. Consider reducing these 
+           tolerances to avoid numerical instabilities. 
+           Defaults to dict(atol = 1e-6, rtol = 1e-9).
+
+    Returns:
+        dict with following fields:
+            T (array):  recall of T
+            pIE (array): probability of extinction of an incipient species within a time t
+            pIG (array): probability of extinction of a good species within a time t
+            pIC (array): probability of completion of an incipient species within a time t
+            pGS (array): probability of speciation from a good species within a time t.     
+    """
+    if T[0] != 0.0:
+        raise ValueError("T[0] must be 0.")
+    
+    par = (l1, l2, l3, m1, m2)
+    Theta = l1 + m1
+    Lambda = l2 + l3 + m2
+    x_l = np.exp(Lambda * T)
+    x_t = np.exp(Theta * T)
+    
+    # Step 1 : solving for pGE
+    sol = scipy.integrate.solve_ivp(ODE_pGE_log, t_span = (x_t[0], x_t[-1]), y0 = [0.0], 
+                                    method = solver_method, args = par, **solver_kwargs)
+    x, g = sol["t"], sol["y"][0,:]
+    dgdx = np.diff(g) / np.diff(x)
+    xGE = 0.5*(x[1:] + x[:-1])
+    tGE = np.log(xGE) / Theta
+    pGE_num =  dgdx / pIE_sol(tGE, *par)
+    pGE = np.interp(T, tGE, pGE_num, left = 0.0)
+
+    # Step 2 : solving for pIC
+    sol = scipy.integrate.solve_ivp(ODE_pIC_log, t_span = (x_l[0], x_l[-1]), y0 = [0.0], 
+                                    method = solver_method, args = par, **solver_kwargs)
+    x, h = sol["t"], sol["y"][0,:]
+    dhdx = np.diff(h) / np.diff(x)
+    xIC = 0.5*(x[1:] + x[:-1])
+    tIC = np.log(xIC) / Lambda 
+    pIC_num = 1 - np.sqrt(dhdx)
+    pIC = np.interp(T, tIC, pIC_num, left = 0.0)
+
+    # Step 3 : solving for pGS
+    sol = scipy.integrate.solve_ivp(ODE_pGS_log, t_span = (x_t[0], x_t[-1]), y0 = [0.0], 
+                                    method = solver_method, args = (T, pIC, *par), 
+                                    **solver_kwargs)
+    x, m = sol["t"], sol["y"][0,:]
+    dmdx = np.diff(m) / np.diff(x)
+    xGS = 0.5*(x[1:] + x[:-1])
+    tGS = np.log(xGS) / Theta
+    pIC_interp = np.interp(tGS, tIC, pIC_num)
+    pGS_num = (dmdx - pIC_interp)/(1-pIC_interp)
+    pGS = np.interp(T, tGS, pGS_num, left = 0.0)
+
+    return dict(T = T, pIE = pIE_sol(T, *par), pIC = pIC,  pGE = pGE, pGS = pGS)
+
+
+
+# Fitting BD model to a PBD model
+
+def time_dep_bd_horiz(pS, pE, t):
+    """ Calculate BD rates from probability of speciation/extinction and time.
+
+    Args:
+        pS (float or array): probability of speciation before a time t.
+        pE (float or array): probability of extinction before a time t.
+        t (float or array): time horizon. pS, pE and t must have equal size.
+
+    Returns:
+        l: time-dependant birth rate(s), same size as t.
+        m: time-dependant death rates(s), same size as t. 
+    
+    Note:
+        if pS+pE == 0.0, nan is returned. 
+    """
+    if np.size(t) == 1 and pS + pE == 0.0:
+        return np.nan 
+    a = -np.log(1 - pS - pE) / t
+    b = pS / pE
+    if type(t) == np.ndarray:
+        a[pS + pE == 0.0] = np.nan
+        b[pS + pE == 0.0] = np.nan
+    return a*b/(1.0+b), a/(1.0+b)
+
+def PBD_to_time_dep_BD(T, l1, l2, l3, m1, m2):
+    """ Calculates time dependant BD rates from PBD parameters.
+
+    Args:
+        T (array): time values, must be sorted.
+        l1 (float > 0): initiation rate from a good species.
+        l2 (float > 0): completion rate of an incipient species.
+        l3 (float >= 0): initiation rate from an incipient species.
+        m1 (float >= 0): extinction rate of a good species. 
+        m2 (float >= 0): extinction rate of an incipient species.
+
+    Returns:
+        l: time-dependant birth rate(s), same size as t.
+        m: time-dependant death rates(s), same size as t. 
+    """
+    probs = PBD_to_probs(T, l1, l2, l3, m1, m2)
+    l_equiv, m_equiv = time_dep_bd_horiz(probs["pGS"], probs["pGE"], T)
+    return l_equiv, m_equiv
