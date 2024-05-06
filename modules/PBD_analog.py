@@ -238,7 +238,8 @@ def time_dep_bd_horiz(pS, pE, t):
         b[pS + pE == 0.0] = np.nan
     return a*b/(1.0+b), a/(1.0+b)
 
-def PBD_to_time_dep_BD(T, l1, l2, l3, m1, m2):
+def PBD_to_time_dep_BD(T, l1, l2, l3, m1, m2, solver_method = "BDF", 
+                       solver_kwargs = dict(atol = 1e-6, rtol = 1e-9)):
     """ Calculates time dependant BD rates from PBD parameters.
 
     Args:
@@ -248,11 +249,18 @@ def PBD_to_time_dep_BD(T, l1, l2, l3, m1, m2):
         l3 (float >= 0): initiation rate from an incipient species.
         m1 (float >= 0): extinction rate of a good species. 
         m2 (float >= 0): extinction rate of an incipient species.
+        solver_method (str or Solver, optional): method used by solver. Must be 
+           accepted by scipy.integrate.solve_ivp. Defaults to "BDF".
+        solver_kwargs (dict, optional): other kwargs passed to the ODE solver, 
+           in particular relative and absolute tolerances. Consider reducing these 
+           tolerances to avoid numerical instabilities. 
+           Defaults to dict(atol = 1e-6, rtol = 1e-9).
 
     Returns:
         l: time-dependant birth rate(s), same size as t.
         m: time-dependant death rates(s), same size as t. 
     """
-    probs = PBD_to_probs(T, l1, l2, l3, m1, m2)
+    probs = PBD_to_probs(T, l1, l2, l3, m1, m2, solver_method=solver_method,
+                         solver_kwargs=solver_kwargs)
     l_equiv, m_equiv = time_dep_bd_horiz(probs["pGS"], probs["pGE"], T)
     return l_equiv, m_equiv
