@@ -25,3 +25,4 @@ The files with `_eq_init` are for the simulations where $\lambda_1 = \lambda_3$.
 * `2024/03/08` run the pipeline for the output of the simulation with cluster ID `12152`, Git version `b2cb4e1`. 
 * `2024/03/11` new run of the pipeline for the output of the simulation with cluster ID `12152`, Git version `73567d2` (a seed has been set in the script `1-simul_BD_get_gamma.R`). 
 * `2024/03/11`, run the pipeline for equal initiation rates, from the cluster ID `12183`, Git version `9a2244c`. 
+* `2024/05/06`, run `1-simul_BD_get_gamma.R` with a new definition of the rates, with parameters from the cluster ID `12152`, Git version `3f0163a`. 
