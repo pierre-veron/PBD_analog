@@ -1,8 +1,8 @@
 library(ape)
 
-setwd("C:/Users/pveron/Output_clusters/PBD_analog/12183")
+setwd("C:/Users/pveron/Output_clusters/PBD_analog/12152")
 
-set.seed(95)
+set.seed(394)
 
 age <- 15
 
@@ -38,14 +38,27 @@ if ("param_vary" %in% colnames(simul_infer)) {
 tree_stats_df <- as.data.frame(t(sapply(rownames(simul_infer), function(rw) {
   param_PBD <- unlist(simul_infer[rw, param_PBD_names])
   eq_bd <- equivalent_bd_rates(param_PBD)
-  tree <- ape::rbdtree(eq_bd[1], eq_bd[2], age)
-  fname <- paste0("CBD_tree_sim_", rw, "_b_", eq_bd[1], "_d_", eq_bd[2],  ".nwk")
-  ape::write.tree(tree, fname)
-  c(unlist(simul_infer[rw, col_to_keep]),
-    "gamma" = ape::gammaStat(tree),
-    "SR" = length(tree$tip.label),
-    "equiv_birth" = eq_bd[1],
-    "equiv_death" = eq_bd[2])
+  tryCatch(
+    {
+    tree <- ape::rbdtree(eq_bd[1], eq_bd[2], age, eps = 1e-04)
+    fname <- paste0("CBD_tree_sim_", rw, "_b_", eq_bd[1], "_d_", eq_bd[2],  ".nwk")
+    ape::write.tree(tree, fname)
+    out <- c(unlist(simul_infer[rw, col_to_keep]),
+      "gamma" = ape::gammaStat(tree),
+      "SR" = length(tree$tip.label),
+      "equiv_birth" = eq_bd[1],
+      "equiv_death" = eq_bd[2])
+    out
+    },
+    error = function(e) {
+      out <- c(unlist(simul_infer[rw, col_to_keep]),
+               "gamma" = NA,
+               "SR" = NA,
+               "equiv_birth" = eq_bd[1],
+               "equiv_death" = eq_bd[2])
+      out
+    }
+  )
 })))
 
 write.csv(tree_stats_df, "simulated_BD_trees_stats.csv")
