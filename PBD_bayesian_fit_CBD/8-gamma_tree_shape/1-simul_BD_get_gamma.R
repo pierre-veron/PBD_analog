@@ -1,6 +1,9 @@
 library(ape)
 
 setwd("C:/Users/pveron/Output_clusters/PBD_analog/12152")
+setwd("~/Nextcloud/Recherche/1_Methods/PBD_analog")
+
+library(treeImbalance)
 
 set.seed(394)
 
@@ -20,7 +23,7 @@ equivalent_bd_rates <- function(param) {
   rates
 }
 
-simul_infer <- read.csv("all_simulations_inference.csv")
+simul_infer <- read.csv("PBD_bayesian_fit_CBD/8-gamma_tree_shape/12152/all_simulations_inference.csv")
 
 param_PBD_names <-  paste0("PBD.", c("l1", "l2", "l3", "mu1", "mu2"))
 
@@ -34,17 +37,17 @@ if ("param_vary" %in% colnames(simul_infer)) {
 
 
 
-
 tree_stats_df <- as.data.frame(t(sapply(rownames(simul_infer), function(rw) {
   param_PBD <- unlist(simul_infer[rw, param_PBD_names])
   eq_bd <- equivalent_bd_rates(param_PBD)
   tryCatch(
     {
     tree <- ape::rbdtree(eq_bd[1], eq_bd[2], age, eps = 1e-04)
-    fname <- paste0("CBD_tree_sim_", rw, "_b_", eq_bd[1], "_d_", eq_bd[2],  ".nwk")
+    fname <- paste0("simulation_output/1-CBD/trees/CBD_tree_sim_", rw, "_b_", eq_bd[1], "_d_", eq_bd[2],  ".nwk")
     ape::write.tree(tree, fname)
     out <- c(unlist(simul_infer[rw, col_to_keep]),
       "gamma" = ape::gammaStat(tree),
+      "B2" = treeImbalance::B2(tree),
       "SR" = length(tree$tip.label),
       "equiv_birth" = eq_bd[1],
       "equiv_death" = eq_bd[2])
@@ -54,6 +57,7 @@ tree_stats_df <- as.data.frame(t(sapply(rownames(simul_infer), function(rw) {
       out <- c(unlist(simul_infer[rw, col_to_keep]),
                "gamma" = NA,
                "SR" = NA,
+               "B2" = NA,
                "equiv_birth" = eq_bd[1],
                "equiv_death" = eq_bd[2])
       out
