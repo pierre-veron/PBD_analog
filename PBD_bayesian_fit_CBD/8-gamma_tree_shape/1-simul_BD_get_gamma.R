@@ -1,9 +1,8 @@
 library(ape)
+library(treestats)
 
 setwd("C:/Users/pveron/Output_clusters/PBD_analog/12152")
 setwd("~/Nextcloud/Recherche/1_Methods/PBD_analog")
-
-library(treeImbalance)
 
 set.seed(394)
 
@@ -42,12 +41,13 @@ tree_stats_df <- as.data.frame(t(sapply(rownames(simul_infer), function(rw) {
   eq_bd <- equivalent_bd_rates(param_PBD)
   tryCatch(
     {
-    tree <- ape::rbdtree(eq_bd[1], eq_bd[2], age, eps = 1e-04)
-    fname <- paste0("simulation_output/1-CBD/trees/CBD_tree_sim_", rw, "_b_", eq_bd[1], "_d_", eq_bd[2],  ".nwk")
-    ape::write.tree(tree, fname)
+    #tree <- ape::rbdtree(eq_bd[1], eq_bd[2], age, eps = 1e-04)
+    fname <- paste0("simulations_output/1-CBD/trees/CBD_tree_sim_", rw, "_b_", eq_bd[1], "_d_", eq_bd[2],  ".nwk")
+    #ape::write.tree(tree, fname)
+    tree <- read.tree(fname)
     out <- c(unlist(simul_infer[rw, col_to_keep]),
       "gamma" = ape::gammaStat(tree),
-      "B2" = treeImbalance::B2(tree),
+      "stairs2" = treestats::stairs2(tree),
       "SR" = length(tree$tip.label),
       "equiv_birth" = eq_bd[1],
       "equiv_death" = eq_bd[2])
@@ -57,7 +57,7 @@ tree_stats_df <- as.data.frame(t(sapply(rownames(simul_infer), function(rw) {
       out <- c(unlist(simul_infer[rw, col_to_keep]),
                "gamma" = NA,
                "SR" = NA,
-               "B2" = NA,
+               "stairs2" = NA,
                "equiv_birth" = eq_bd[1],
                "equiv_death" = eq_bd[2])
       out

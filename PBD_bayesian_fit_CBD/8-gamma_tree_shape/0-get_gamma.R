@@ -2,7 +2,7 @@
 library(ape)
 library(phylobase)
 library(adephylo)
-library(treeImbalance)
+library(treestats)
 
 #setwd("C:/Users/pveron/Output_clusters/PBD_analog/12152")
 setwd("~/Nextcloud/Recherche/1_Methods/PBD_analog")
@@ -22,7 +22,7 @@ list_out <- lapply(1:n_par, function(i_par) {
         "i_param_var" = i_val, 
         "replicate" = i_rep, 
         "gamma" = ape::gammaStat(tree),
-        "B2" = treeImbalance::B2(tree),
+        "stairs2" = treestats::stairs2(tree),
         "SR" = length(tree$tip.label))
     }))
     out
