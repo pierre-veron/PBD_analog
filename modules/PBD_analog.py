@@ -264,3 +264,126 @@ def PBD_to_time_dep_BD(T, l1, l2, l3, m1, m2, solver_method = "BDF",
                          solver_kwargs=solver_kwargs)
     l_equiv, m_equiv = time_dep_bd_horiz(probs["pGS"], probs["pGE"], T)
     return l_equiv, m_equiv
+
+def find_convergence_point(x, tol = 0.0001, w = 5, silent = False):
+    """Find the minimum index i such as local convergence is satisfied. The 
+    convergence is satisfied when 
+    max(x[i : i+w]) - min(x[i : i+w]) < tol
+    The test is made on all dimensions of the first axis of x. The convergence must
+    be satisfied for all axes of x. 
+
+    Args:
+        x (np.ndarray, 2 dimensional): array to test for convergence. The 
+           convergence is tested on the second axis of the object. 
+        tol (float > 0, optional): tolerance for the convergence test. 
+           Defaults to 0.0001.
+        w (int > 1, optional): window size for the convergence test. 
+            Defaults to 5.
+        silent (bool, optional): if False, prompts a message if the convergence 
+            criterion is not satisfied. Defaults to False.
+
+
+
+
+    Returns:
+        int or None: minimal index such that the local convergence criterion 
+            is met, or None if this criterion is not met. 
+    """
+    i = 0
+    n = np.shape(x)[1]
+    dim = np.shape(x)[0]
+    cv = False
+    while i < n - w and not(cv):
+        try_cv = True 
+        d = 0
+        while d < dim and try_cv:
+            window = x[d, i:(i+w)]
+            try_cv = max(window) - min(window) < tol # test convergence 
+            d+=1
+        cv = try_cv
+        i += 1 
+    if cv:
+        return i
+    else:
+        if not(silent):
+            print("Convergence test failed")
+        return None
+
+
+
+def constant_after_conv(rates, tol = 0.0001, w = 5, silent = False):
+    """ Sets an array constant to a local minimum after a certain convergence 
+    criteria is met.
+
+    Args:
+        rates (np.ndarray, 2 dimensional): array to test for convergence. The 
+           convergence is tested on the second axis of the object. 
+        tol (float > 0, optional): tolerance for the convergence test. 
+           Defaults to 0.0001.
+        w (int > 1, optional): window size for the convergence test. 
+            Defaults to 5.
+        silent (bool, optional): if False, prompts a message if the convergence 
+            criterion is not satisfied. Defaults to False.
+
+    Returns:
+        np.ndarray, same size as rate: rates with values after the local convergence
+            criterion is satisfied set to a local mean, or a copy of rates if 
+            no convergence is detected. 
+    """
+    i_cv = find_convergence_point(rates, tol, w, silent)
+    dim = np.shape(rates)[0]
+    if not(i_cv is None):
+        mean = np.mean(rates[:, i_cv:(i_cv+w)], axis=1)
+        rates_cv = np.copy(rates)
+        for d in range(dim):
+            rates_cv[d,i_cv+w-1:] = mean[d]
+        return rates_cv
+    return rates 
+
+def forward_PBD_to_time_dep_BD(T, l1, l2, l3, m1, m2, solver_method = "BDF", 
+                       solver_kwargs = dict(atol = 1e-6, rtol = 1e-9),
+                       smooth_convergence = True,
+                       conv_crit = dict(tol = 1e-4, w = 5, silent = False)):
+    """ Calculate equivalent BD rates from PBD model based on probabilities 
+    of speciation and extinction using a forward approach
+
+    Args:
+        T (array): time values, must be sorted.
+        l1 (float > 0): initiation rate from a good species.
+        l2 (float > 0): completion rate of an incipient species.
+        l3 (float >= 0): initiation rate from an incipient species.
+        m1 (float >= 0): extinction rate of a good species. 
+        m2 (float >= 0): extinction rate of an incipient species.
+        solver_method (str or Solver, optional): method used by solver. Must be 
+           accepted by scipy.integrate.solve_ivp. Defaults to "BDF".
+        solver_kwargs (dict, optional): other kwargs passed to the ODE solver, 
+           in particular relative and absolute tolerances. Consider reducing these 
+           tolerances to avoid numerical instabilities. 
+           Defaults to dict(atol = 1e-6, rtol = 1e-9).
+        smooth_convergence (bool, optional): 
+        conv_crit (dict, optional): kwargs passed to the convergence function that 
+           sets the value of the rates to constant after a certain convergence 
+           criterion is met. Useless if smooth_convergence is False. For details 
+           see the functions constant_after_conv and find_convergence_point.
+           Defaults to dict(tol = 1e-4, w = 5, silent = False).
+
+    Returns:
+        l: time-dependant birth rate(s), same size as t.
+        m: time-dependant death rates(s), same size as t. 
+    """
+    probs = PBD_to_probs(T, l1, l2, l3, m1, m2, solver_method=solver_method,
+                         solver_kwargs=solver_kwargs)
+    pGS, pGE = probs["pGS"], probs["pGE"]
+    dpS = np.diff(pGS) / np.diff(T)
+    dpE = np.diff(pGE) / np.diff(T)
+    rates = np.zeros((2, len(T))) # rates[0,:] = birth, rates[1,:] = death
+    rates[:, :-1] = np.array([dpS, dpE]) / (1 - pGS[1:] - pGE[1:])
+    
+    # the last two points are unstable because of derivation twice
+    rates[0, -2:] = rates[0, -3]
+    rates[1, -2:] = rates[1, -3]
+
+    # smoothing if convergence detected 
+    if smooth_convergence:
+        rates = constant_after_conv(rates, **conv_crit)
+    return rates[0,:], rates[1,:]
