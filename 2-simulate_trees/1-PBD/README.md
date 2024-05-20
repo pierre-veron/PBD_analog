@@ -29,4 +29,4 @@ simulations_output/1-PBD
 ```
 
 ## History 
-* `2024-05-19`: Run simulations on the cluster for `1-simulate_with_PBD.R` (cluster ID `12946`)
+* `2024-05-19`: Run simulations on the cluster for `1-simulate_with_PBD.R` (cluster ID `12946`, Git version ` d5a5323`)
