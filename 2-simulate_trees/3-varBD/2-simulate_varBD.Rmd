@@ -16,7 +16,7 @@ library(ape)
 
 ```{r}
 np <- import("numpy")
-BD_rtt <- np$load("variable_BDrates.npy", allow_pickle=T)
+BD_rtt <- np$load("../../simulations_output/3-varBD/variable_BDrates.npy", allow_pickle=T)
 #params <- data.frame(apply(BD_rtt[,5:9], 2, as.numeric))
 #names(params) <- c("l1","l2","l3","m1","m2")
 #params
@@ -32,13 +32,20 @@ plot(BD_rtt[[1]]$death_rate)
 
 ```{r}
 sim_tree <- function(RTT){
-  tree <- withTimeout(sim.bdsky.stt(n           = 0, 
-                                    timestop    = age, 
-                                    lambdasky   = rev(RTT$birth_rate[-1]), 
-                                    deathsky    = rev(RTT$death_rate[-1]), 
-                                    timesky     = c(0, seq(0.01, age, length.out=200)[2:199]), 
-                                    sampprobsky = rep(0,199), 
-                                    rho         = 1), timeout = 10.0, onTimeout = "warning")
+  tree <- withTimeout(sim.bdsky.stt(n           = 0,
+                                   timestop    = age,
+                                   lambdasky   = rev(RTT$birth_rate),
+                                   deathsky    = rev(RTT$death_rate),
+                                   timesky     = seq(0.0, age, length.out=200),
+                                   sampprobsky = rep(0,200),
+                                   rho         = 1), timeout = 10.0, onTimeout = "warning")
+  # tree <- sim.bdsky.stt(n           = 0, 
+  #                       timestop    = age, 
+  #                       lambdasky   = rev(RTT$birth_rate[-1]), 
+  #                       deathsky    = rev(RTT$death_rate[-1]), 
+  #                       timesky     = c(0, seq(0.01, age, length.out=200)[2:199]), 
+  #                       sampprobsky = rep(0,199), 
+  #                       rho         = 1)
   if (is.numeric(tree) && tree == age){
     branch <- list(edge =  matrix(c(2, 1), ncol = 2), edge.length = age, tip.label = "t1", Nnode = 1, root.edge = 0)
     class(branch) <- "phylo"
@@ -49,17 +56,34 @@ sim_tree <- function(RTT){
 }
 
 age=15
-n_trees=200
+n_trees  = 100
+n_trials = 100
+
+## Crown simulations
+# sim_BDtrees <- lapply(BD_rtt, function(RTT)lapply(1:n_trees, function(i){
+#   i <- 0
+#   while (i<10){
+#     #print(paste("i=", i))
+#     tree_left <- sim_tree(RTT)
+#     if (is.phylo(tree_left)){
+#       tree_right <- sim_tree(RTT)
+#       if (is.phylo(tree_right)){
+#         return(bind.tree(tree_left, tree_right, position=tree_left$root.edge))
+#       }
+#     }
+#     i <- i+1
+#   }
+#   return(-1)
+# }))
+
+## Stem simulations
 sim_BDtrees <- lapply(BD_rtt, function(RTT)lapply(1:n_trees, function(i){
   i <- 0
-  while (i<100){
+  while (i<n_trials){
     #print(paste("i=", i))
-    tree_left <- sim_tree(RTT)
-    if (is.phylo(tree_left)){
-      tree_right <- sim_tree(RTT)
-      if (is.phylo(tree_right)){
-        return(bind.tree(tree_left, tree_right, position=tree_left$root.edge))
-      }
+    tree <- sim_tree(RTT)
+    if (is.phylo(tree)){
+      return(tree)
     }
     i <- i+1
   }
@@ -68,7 +92,7 @@ sim_BDtrees <- lapply(BD_rtt, function(RTT)lapply(1:n_trees, function(i){
 ```
 
 ```{r message=FALSE}
-sim_BDtrees_summary <- summary(sapply(sim_BDtrees, sapply, function(x)ifelse(is.phylo(x), is.binary.tree(x), NA)))
+sim_BDtrees_summary <- summary(sapply(sim_BDtrees, sapply, function(x)ifelse(is.phylo(x), length(x$tip.label) == 1 || is.binary.tree(x), NA)))
 sim_BDtrees_summary
 
 make.binary <- function(tree){
@@ -88,8 +112,8 @@ make.binary <- function(tree){
   }
   return(tree)
 }
-sim_BDtrees_binary <- lapply(sim_BDtrees, lapply, function(x)if(is.phylo(x)){make.binary(x)}else{-1})
-summary(sapply(sim_BDtrees_binary, sapply, function(x)ifelse(is.phylo(x), is.binary(x), NA)))
+sim_BDtrees_binary <- lapply(sim_BDtrees, lapply, function(x)if(is.phylo(x)){if(length(x$tip.label)==1){x}else{make.binary(x)}}else{-1})
+summary(sapply(sim_BDtrees_binary, sapply, function(x)ifelse(is.phylo(x), length(x$tip.label) == 1 || is.binary(x), NA)))
 ```
 
 ```{r}
@@ -101,11 +125,11 @@ Ntips
 Relabel tree tips to avoid duplicates
 
 ```{r}
-new_tip_labels <- function(tree){
-  tree$tip.label <- paste0("t", 1:length(tree$tip.label))
-  return(tree)
-}
-sim_BDtrees_binary <- lapply(sim_BDtrees_binary, lapply, function(x)if(is.phylo(x)){new_tip_labels(x)}else{x})
+#new_tip_labels <- function(tree){
+#  tree$tip.label <- paste0("t", 1:length(tree$tip.label))
+#  return(tree)
+#}
+#sim_BDtrees_binary <- lapply(sim_BDtrees_binary, lapply, function(x)if(is.phylo(x)){new_tip_labels(x)}else{x})
 ```
 
 ```{r}
