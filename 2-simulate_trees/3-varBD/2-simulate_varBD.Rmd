@@ -34,8 +34,8 @@ plot(BD_rtt[[1]]$death_rate)
 sim_tree <- function(RTT){
   tree <- withTimeout(sim.bdsky.stt(n           = 0,
                                    timestop    = age,
-                                   lambdasky   = rev(RTT$birth_rate),
-                                   deathsky    = rev(RTT$death_rate),
+                                   lambdasky   = RTT$birth_rate,
+                                   deathsky    = RTT$death_rate,
                                    timesky     = seq(0.0, age, length.out=200),
                                    sampprobsky = rep(0,200),
                                    rho         = 1), timeout = 60.0, onTimeout = "warning")
@@ -46,10 +46,13 @@ sim_tree <- function(RTT){
   #               timesky     = seq(0.0, age, length.out=200),
   #               sampprobsky = rep(0,200),
   #               rho         = 1)
+  
+  # Single tip
   if (is.numeric(tree) && tree == age){
-    branch <- list(edge =  matrix(c(2, 1), ncol = 2), edge.length = age, tip.label = "t1", Nnode = 1, root.edge = 0)
-    class(branch) <- "phylo"
-    return(branch)
+    #branch <- list(edge =  matrix(c(2, 1), ncol = 2), edge.length = age, tip.label = "t1", Nnode = 1, root.edge = 0)
+    #class(branch) <- "phylo"
+    #return(branch)
+    return(-1)
   }
   
   return(tree[[1]])

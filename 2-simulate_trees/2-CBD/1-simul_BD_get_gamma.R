@@ -41,10 +41,12 @@ param_PBD_names <-  paste0("PBD.", c("l1", "l2", "l3", "mu1", "mu2"))
 sim_tree_BD <- function(lambda, mu){
   tree <- sim.bdsky.stt(n = 0, lambdasky = lambda, deathsky = mu, timesky = 0.0, sampprobsky = 0, rho = 1, timestop = age)[[1]]
   
+  # Single tip
   if (is.numeric(tree) && tree == 1){
-    branch <- list(edge =  matrix(c(2, 1), ncol = 2), edge.length = age, tip.label = "t1", Nnode = 1, root.edge = 0)
-    class(branch) <- "phylo"
-    return(branch)
+    #branch <- list(edge =  matrix(c(2, 1), ncol = 2), edge.length = age, tip.label = "t1", Nnode = 1, root.edge = 0)
+    #class(branch) <- "phylo"
+    #return(branch)
+    return(-1)
   }
   
   return(tree)
