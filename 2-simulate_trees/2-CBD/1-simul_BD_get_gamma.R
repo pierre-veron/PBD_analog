@@ -1,11 +1,15 @@
 library(ape)
 library(treestats)
+library(TreeSim)
 
-setwd("C:\Users\pveron\Documents\GitHub\PBD_analog")
+#setwd("C:\Users\pveron\Documents\GitHub\PBD_analog")
+#setwd("Users/Jeremy/Nextcloud/Recherche/1_Methods/PBD_analog")
 
 set.seed(394)
 
 age <- 15
+n_trees  = 500
+n_trials = 100
 
 equivalent_bd_rates <- function(param) {
   l1 <- param[1]
@@ -21,47 +25,67 @@ equivalent_bd_rates <- function(param) {
   rates
 }
 
-simul_infer <- read.csv("simulations_output/PBD/all_simulations_inference.csv")
+sim_pars <- read.csv("2-simulate_trees/3-varBD/sim_parameters.csv")
+#simul_infer <- read.csv("simulations_output/1-PBD/all_simulations_inference.csv")
 
 param_PBD_names <-  paste0("PBD.", c("l1", "l2", "l3", "mu1", "mu2"))
 
 
 # Case of simulations where only one parameter varies
-if ("param_vary" %in% colnames(simul_infer)) {
-  col_to_keep <- c("param_vary", "i_param_var", "replicate", param_PBD_names)
-} else {
-  col_to_keep <- c("i_param_var", "replicate", param_PBD_names)
+#if ("param_vary" %in% colnames(simul_infer)) {
+#  col_to_keep <- c("param_vary", "i_param_var", "replicate", param_PBD_names)
+#} else {
+#  col_to_keep <- c("i_param_var", "replicate", param_PBD_names)
+#}
+
+sim_tree_BD <- function(lambda, mu){
+  tree <- sim.bdsky.stt(n = 0, lambdasky = lambda, deathsky = mu, timesky = 0.0, sampprobsky = 0, rho = 1, timestop = age)[[1]]
+  
+  if (is.numeric(tree) && tree == 1){
+    branch <- list(edge =  matrix(c(2, 1), ncol = 2), edge.length = age, tip.label = "t1", Nnode = 1, root.edge = 0)
+    class(branch) <- "phylo"
+    return(branch)
+  }
+  
+  return(tree)
 }
 
-
-
-
-tree_stats_df <- as.data.frame(t(sapply(rownames(simul_infer), function(rw) {
-  param_PBD <- unlist(simul_infer[rw, param_PBD_names])
+trees <- apply(sim_pars[param_PBD_names], 1, function(param_PBD){
   eq_bd <- equivalent_bd_rates(param_PBD)
-  tryCatch(
-    {
-    tree <- ape::rbdtree(eq_bd[1], eq_bd[2], age, eps = 1e-04)
-    fname <- paste0("simulations_output/2-CBD/trees/CBD_tree_sim_", rw, "_b_", eq_bd[1], "_d_", eq_bd[2],  ".nwk")
-    ape::write.tree(tree, fname)
-    out <- c(unlist(simul_infer[rw, col_to_keep]),
-      "gamma" = ape::gammaStat(tree),
-      "stairs2" = treestats::stairs2(tree),
-      "SR" = length(tree$tip.label),
-      "equiv_birth" = eq_bd[1],
-      "equiv_death" = eq_bd[2])
-    out
-    },
-    error = function(e) {
-      out <- c(unlist(simul_infer[rw, col_to_keep]),
-               "gamma" = NA,
-               "SR" = NA,
-               "stairs2" = NA,
-               "equiv_birth" = eq_bd[1],
-               "equiv_death" = eq_bd[2])
-      out
-    }
-  )
-})))
+  lapply(1:n_trees, function(n){
+      i <- 0
+      while (i<n_trials){
+        if (eq_bd[1] - eq_bd[2] > log(10000)/age) return (NULL) ## Remove trees whose expected size is too large
+        tree <- sim_tree_BD(lambda = eq_bd[1], mu = eq_bd[2])
+        if (is.phylo(tree)) return (tree)
+        i <- i+1
+      }
+  })
+})
 
-write.csv(tree_stats_df, "simulations_output/2-CBD/simulated_BD_trees_stats.csv")
+Ntips <- sapply(trees, sapply, function(result)if(is.null(result)){NA}else{length(result$tip.label)})
+
+trees_gammma <- sapply(trees, sapply, function(result){
+  if (is.null(result)){
+    return(NaN)
+  }else{
+    return(ape::gammaStat(result))
+  }
+})
+
+trees_stairs2 <- sapply(trees, sapply, function(result){
+  if (is.null(result)){
+    return(NaN)
+  }else{
+    return(treestats::stairs2(result))
+  }
+})
+
+trees_stats <- data.frame(param_vary = rep(rep(1:5, each=5), n_trees), 
+                          i_param_var = rep(1:5, n_trees), 
+                          replicate = rep(0:(n_trees-1), each=nrow(sim_pars)),
+                          gamma = as.numeric(t(trees_gammma)),
+                          stairs2 = as.numeric(t(trees_stairs2)),
+                          SR = as.integer(t(Ntips)))
+
+write.csv(trees_stats, "simulations_output/2-CBD/simulated_BD_trees_stats.csv")

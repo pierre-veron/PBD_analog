@@ -38,14 +38,14 @@ sim_tree <- function(RTT){
                                    deathsky    = rev(RTT$death_rate),
                                    timesky     = seq(0.0, age, length.out=200),
                                    sampprobsky = rep(0,200),
-                                   rho         = 1), timeout = 10.0, onTimeout = "warning")
-  # tree <- sim.bdsky.stt(n           = 0, 
-  #                       timestop    = age, 
-  #                       lambdasky   = rev(RTT$birth_rate[-1]), 
-  #                       deathsky    = rev(RTT$death_rate[-1]), 
-  #                       timesky     = c(0, seq(0.01, age, length.out=200)[2:199]), 
-  #                       sampprobsky = rep(0,199), 
-  #                       rho         = 1)
+                                   rho         = 1), timeout = 60.0, onTimeout = "warning")
+  # sim.bdsky.stt(n           = 0,
+  #               timestop    = age,
+  #               lambdasky   = rev(RTT$birth_rate),
+  #               deathsky    = rev(RTT$death_rate),
+  #               timesky     = seq(0.0, age, length.out=200),
+  #               sampprobsky = rep(0,200),
+  #               rho         = 1)
   if (is.numeric(tree) && tree == age){
     branch <- list(edge =  matrix(c(2, 1), ncol = 2), edge.length = age, tip.label = "t1", Nnode = 1, root.edge = 0)
     class(branch) <- "phylo"
@@ -56,7 +56,7 @@ sim_tree <- function(RTT){
 }
 
 age=15
-n_trees  = 100
+n_trees  = 500
 n_trials = 100
 
 ## Crown simulations
@@ -78,6 +78,7 @@ n_trials = 100
 
 ## Stem simulations
 sim_BDtrees <- lapply(BD_rtt, function(RTT)lapply(1:n_trees, function(i){
+  if (mean(RTT$birth_rate - RTT$death_rate) > log(10000)/age) return(-1) ## Remove trees whose expected size is too large
   i <- 0
   while (i<n_trials){
     #print(paste("i=", i))
@@ -91,34 +92,39 @@ sim_BDtrees <- lapply(BD_rtt, function(RTT)lapply(1:n_trees, function(i){
 }))
 ```
 
-```{r message=FALSE}
-sim_BDtrees_summary <- summary(sapply(sim_BDtrees, sapply, function(x)ifelse(is.phylo(x), length(x$tip.label) == 1 || is.binary.tree(x), NA)))
-sim_BDtrees_summary
+```{r}
+#trees_Ntips <- sapply(trees, function(result)if(is.numeric(result)){NA}else{length(result$tip.label)})
+#quantile(trees_Ntips, c(0.1, 0.5, 0.9), na.rm = T)
+```
 
-make.binary <- function(tree){
-  while (!is.binary.tree(tree)){
-    i_max_1 <- which.max(tree$edge[,1])
-    i_max_2 <- which.max(tree$edge[,2])
-    tree$edge <- cbind(tree$edge[-i_max_1,1], tree$edge[-i_max_2,2])
-    tree$Nnode <- tree$Nnode - 1
-    len = length(tree$edge.length)
-    if (i_max_2==1){
-      tree$edge.length <- c(tree$edge.length[1]+tree$edge.length[2], tree$edge.length[3:len])
-    }else if (i_max_2 == len-1){
-      tree$edge.length <- c(tree$edge.length[1:(i_max_2-1)], tree$edge.length[i_max_2]+tree$edge.length[i_max_2+1])
-    }else{
-      tree$edge.length <- c(tree$edge.length[1:(i_max_2-1)], tree$edge.length[i_max_2]+tree$edge.length[i_max_2+1], tree$edge.length[(i_max_2+2):length(tree$edge.length)])
-    }
-  }
-  return(tree)
-}
-sim_BDtrees_binary <- lapply(sim_BDtrees, lapply, function(x)if(is.phylo(x)){if(length(x$tip.label)==1){x}else{make.binary(x)}}else{-1})
+```{r warning = FALSE, message=FALSE}
+# sim_BDtrees_summary <- summary(sapply(sim_BDtrees, sapply, function(x)ifelse(is.phylo(x), length(x$tip.label) == 1 || is.binary.tree(x), NA)))
+# sim_BDtrees_summary
+# 
+# make.binary <- function(tree){
+#   while (!is.binary.tree(tree)){
+#     i_max_1 <- which.max(tree$edge[,1])
+#     i_max_2 <- which.max(tree$edge[,2])
+#     tree$edge <- cbind(tree$edge[-i_max_1,1], tree$edge[-i_max_2,2])
+#     tree$Nnode <- tree$Nnode - 1
+#     len = length(tree$edge.length)
+#     if (i_max_2==1){
+#       tree$edge.length <- c(tree$edge.length[1]+tree$edge.length[2], tree$edge.length[3:len])
+#     }else if (i_max_2 == len-1){
+#       tree$edge.length <- c(tree$edge.length[1:(i_max_2-1)], tree$edge.length[i_max_2]+tree$edge.length[i_max_2+1])
+#     }else{
+#       tree$edge.length <- c(tree$edge.length[1:(i_max_2-1)], tree$edge.length[i_max_2]+tree$edge.length[i_max_2+1], tree$edge.length[(i_max_2+2):length(tree$edge.length)])
+#     }
+#   }
+#   return(tree)
+# }
+# sim_BDtrees_binary <- lapply(sim_BDtrees, lapply, function(x)if(is.phylo(x)){if(length(x$tip.label)==1){x}else{make.binary(x)}}else{-1})
+sim_BDtrees_binary <- sim_BDtrees
 summary(sapply(sim_BDtrees_binary, sapply, function(x)ifelse(is.phylo(x), length(x$tip.label) == 1 || is.binary(x), NA)))
 ```
 
 ```{r}
 Ntips <- sapply(sim_BDtrees_binary, sapply, function(result)if(is.numeric(result)){NA}else{length(result$tip.label)})
-Ntips <- apply(Ntips, 2, as.numeric)
 Ntips
 ```
 
@@ -141,7 +147,7 @@ for (i in seq_along(sim_BDtrees_binary)) {
 }
 ```
 
-```{r}
+```{r warning=FALSE}
 trees_gammma <- sapply(sim_BDtrees_binary, sapply, function(result){
   if (is.numeric(result)){
     return(NaN)
@@ -166,8 +172,8 @@ trees_stairs2
 ```{r}
 simul_infer <- read.csv("../../simulations_output/1-PBD/all_simulations_inference.csv", row.names = 1)
 
-trees_stats <- data.frame(param_vary = simul_infer[1:(n_trees*length(BD_rtt)), "param_vary"], 
-                          i_param_var = simul_infer[1:(n_trees*length(BD_rtt)), "i_param_var"], 
+trees_stats <- data.frame(param_vary = rep(rep(1:5, each=5), n_trees), 
+                          i_param_var = rep(1:5, n_trees), 
                           replicate = rep(0:(n_trees-1), each=length(BD_rtt)),
                           gamma = as.numeric(t(trees_gammma)),
                           stairs2 = as.numeric(t(trees_stairs2)),

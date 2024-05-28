@@ -1,0 +1,13 @@
+axes.prop_cycle : cycler(color=['000000', 'cf5c36', 'bcd696', '985f99', '9684a1'])
+font.size : 13
+font.sans-serif : Arial
+mathtext.fontset : custom
+mathtext.rm : Arial
+mathtext.it : Arial:italic
+figure.autolayout : True
+savefig.format : pdf
+xtick.labelsize : small
+ytick.labelsize : small
+legend.framealpha : 1
+legend.edgecolor : k
+legend.fancybox : False

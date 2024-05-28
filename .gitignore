@@ -2,3 +2,6 @@ __pycache__/
 .Rhistory
 .vscode/settings.json
 PBDD_bayesian_fit_BDD/datasets_PBDD/
+simulations_output/1-PBD/trees
+simulations_output/2-CBD/trees
+simulations_output/3-varBD/trees

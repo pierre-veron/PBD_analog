@@ -4,7 +4,7 @@ library(phylobase)
 library(adephylo)
 library(treestats)
 
-#setwd("C:/Users/pveron/Documents/GitHub/PBD_analog")
+setwd("C:/Users/pveron/Documents/GitHub/PBD_analog")
 
 n_par <- 5
 n_val <- 5

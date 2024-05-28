@@ -4,9 +4,8 @@ from matplotlib.cbook import boxplot_stats
 import json
 
 # Adapt this section
-outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12152"
+outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12946"
 n_replicates = 200
-mcmc_size = 5000
 
 list_df = []
 
