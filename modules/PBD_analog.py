@@ -263,7 +263,7 @@ def PBD_to_time_dep_BD(T, l1, l2, l3, m1, m2, solver_method = "BDF",
     probs = PBD_to_probs(T, l1, l2, l3, m1, m2, solver_method=solver_method,
                          solver_kwargs=solver_kwargs)
     l_equiv, m_equiv = time_dep_bd_horiz(probs["pGS"], probs["pGE"], T)
-    return l_equiv, m_equiv
+    return np.flip(l_equiv), np.flip(m_equiv)
 
 def find_convergence_point(x, tol = 0.0001, w = 5, silent = False):
     """Find the minimum index i such as local convergence is satisfied. The 
@@ -386,4 +386,31 @@ def forward_PBD_to_time_dep_BD(T, l1, l2, l3, m1, m2, solver_method = "BDF",
     # smoothing if convergence detected 
     if smooth_convergence:
         rates = constant_after_conv(rates, **conv_crit)
-    return rates[0,:], rates[1,:]
+    return np.flip(rates[0,:]), np.flip(rates[1,:]) # flip to have the present = last value
+
+def fixedZero_PBD_to_varBD(T, l1, l2, l3, m1, m2, solver_method = "BDF", 
+                       solver_kwargs = dict(atol = 1e-6, rtol = 1e-9),
+                       smooth_convergence = True,
+                       conv_crit = dict(tol = 1e-4, w = 5, silent = False)):
+    probs = PBD_to_probs(T, l1, l2, l3, m1, m2, solver_method=solver_method,
+                         solver_kwargs=solver_kwargs)
+    p, q = probs["pGS"], probs["pGE"]
+    f = p + q
+    dT = np.diff(T)
+    dfdt = np.diff(f)/dT
+    dqdt = np.diff(q) / dT
+    rates = np.zeros((2, len(T))) # rates[0,:] = birth, rates[1,:] = death
+    sumrates = dfdt / (1 - f[:-1])
+
+    mu = dqdt + sumrates * q[:-1]
+    l = sumrates - mu
+    rates[0, :-1] = l
+    rates[1, :-1] = mu
+
+    # the last two points are unstable because of derivation twice
+    rates[0, -2:] = rates[0, -3]
+    rates[1, -2:] = rates[1, -3]
+    # stabilize if convergence
+    if smooth_convergence:
+        rates = constant_after_conv(rates, **conv_crit)
+    return np.flip(rates[0,:]), np.flip(rates[1,:]) # flip to have the present = last value
