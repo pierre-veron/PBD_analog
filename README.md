@@ -33,5 +33,5 @@ plt.style.use("customstyle.mplstyle")
 ```
 
 ## Contact
-* Pierre Veron (`pierre.veron.2017@polytechnique.org`)
+* [Pierre Veron](https://www.ese.universite-paris-saclay.fr/en/team-members/pierre-veron/) (`pierre.veron.2017@polytechnique.org`)
 * Jérémy Andréoletti
