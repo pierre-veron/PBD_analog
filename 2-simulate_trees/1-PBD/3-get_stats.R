@@ -8,7 +8,7 @@ setwd("C:/Users/pveron/Documents/GitHub/PBD_analog")
 
 n_par <- 5
 n_val <- 5
-n_rep <- 200
+n_rep <- 500
 
 list_out <- lapply(1:n_par, function(i_par) {
   list_out <- lapply(1:n_val, function(i_val) {

@@ -4,12 +4,11 @@ from matplotlib.cbook import boxplot_stats
 import json
 
 # Adapt this section
-outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12946"
-n_replicates = 200
+outdir = "C:/Users/pveron/Output_clusters/PBD_analog/12946-12971"
+n_replicates = 500
 
 list_df = []
 
-np.random.seed(266)
 
 for i in range(n_replicates):
     list_df.append(pd.read_csv(outdir + "/all_simulations_inference-rep-{}.csv".format(i)))
