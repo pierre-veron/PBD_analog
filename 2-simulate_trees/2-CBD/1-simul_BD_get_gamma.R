@@ -3,7 +3,7 @@ library(treestats)
 library(TreeSim)
 
 #setwd("C:\Users\pveron\Documents\GitHub\PBD_analog")
-#setwd("Users/Jeremy/Nextcloud/Recherche/1_Methods/PBD_analog")
+setwd("Users/Jeremy/Nextcloud/Recherche/1_Methods/PBD_analog")
 
 set.seed(394)
 
@@ -83,11 +83,20 @@ trees_stairs2 <- sapply(trees, sapply, function(result){
   }
 })
 
+trees_beta <- sapply(trees, sapply, function(result){
+  if (is.null(result)){
+    return(NaN)
+  }else{
+    return(treestats::beta_statistic(result))
+  }
+})
+
 trees_stats <- data.frame(param_vary = rep(rep(1:5, each=5), n_trees), 
                           i_param_var = rep(1:5, n_trees), 
                           replicate = rep(0:(n_trees-1), each=nrow(sim_pars)),
                           gamma = as.numeric(t(trees_gammma)),
                           stairs2 = as.numeric(t(trees_stairs2)),
+                          beta = as.numeric(t(trees_beta)),
                           SR = as.integer(t(Ntips)))
 
 write.csv(trees_stats, "simulations_output/2-CBD/simulated_BD_trees_stats.csv")

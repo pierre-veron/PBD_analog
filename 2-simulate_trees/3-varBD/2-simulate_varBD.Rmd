@@ -32,20 +32,20 @@ plot(BD_rtt[[1]]$death_rate)
 
 ```{r}
 sim_tree <- function(RTT){
-  tree <- withTimeout(sim.bdsky.stt(n           = 0,
-                                   timestop    = age,
-                                   lambdasky   = RTT$birth_rate,
-                                   deathsky    = RTT$death_rate,
-                                   timesky     = seq(0.0, age, length.out=200),
-                                   sampprobsky = rep(0,200),
-                                   rho         = 1), timeout = 60.0, onTimeout = "warning")
-  # sim.bdsky.stt(n           = 0,
-  #               timestop    = age,
-  #               lambdasky   = rev(RTT$birth_rate),
-  #               deathsky    = rev(RTT$death_rate),
-  #               timesky     = seq(0.0, age, length.out=200),
-  #               sampprobsky = rep(0,200),
-  #               rho         = 1)
+  #tree <- withTimeout(sim.bdsky.stt(n           = 0,
+  #                                 timestop    = age,
+  #                                 lambdasky   = RTT$birth_rate,
+  #                                 deathsky    = RTT$death_rate,
+  #                                 timesky     = seq(0.0, age, length.out=200),
+  #                                 sampprobsky = rep(0,200),
+  #                                 rho         = 1), timeout = 60.0, onTimeout = "warning")
+   tree <- sim.bdsky.stt(n           = 0,
+                         timestop    = age,
+                         lambdasky   = RTT$birth_rate,
+                         deathsky    = RTT$death_rate,
+                         timesky     = seq(0.0, age, length.out=200),
+                         sampprobsky = rep(0,200),
+                         rho         = 1)
   
   # Single tip
   if (is.numeric(tree) && tree == age){
@@ -95,11 +95,6 @@ sim_BDtrees <- lapply(BD_rtt, function(RTT)lapply(1:n_trees, function(i){
 }))
 ```
 
-```{r}
-#trees_Ntips <- sapply(trees, function(result)if(is.numeric(result)){NA}else{length(result$tip.label)})
-#quantile(trees_Ntips, c(0.1, 0.5, 0.9), na.rm = T)
-```
-
 ```{r warning = FALSE, message=FALSE}
 # sim_BDtrees_summary <- summary(sapply(sim_BDtrees, sapply, function(x)ifelse(is.phylo(x), length(x$tip.label) == 1 || is.binary.tree(x), NA)))
 # sim_BDtrees_summary
@@ -131,16 +126,6 @@ Ntips <- sapply(sim_BDtrees_binary, sapply, function(result)if(is.numeric(result
 Ntips
 ```
 
-Relabel tree tips to avoid duplicates
-
-```{r}
-#new_tip_labels <- function(tree){
-#  tree$tip.label <- paste0("t", 1:length(tree$tip.label))
-#  return(tree)
-#}
-#sim_BDtrees_binary <- lapply(sim_BDtrees_binary, lapply, function(x)if(is.phylo(x)){new_tip_labels(x)}else{x})
-```
-
 ```{r}
 for (i in seq_along(sim_BDtrees_binary)) {
   sim_success <- sapply(sim_BDtrees_binary[[i]], is.phylo)
@@ -148,6 +133,31 @@ for (i in seq_along(sim_BDtrees_binary)) {
     write.tree(sim_BDtrees_binary[[i]][sim_success], file=paste0("../../simulations_output/3-varBD/trees/sim_varBD_pars", i, ".trees"))
   }
 }
+```
+
+```{r}
+# Function to reload saved trees
+reload_sim_BDtrees <- function(path, num_pars, n_trees) {
+  sim_BDtrees_binary <- vector("list", num_pars)
+  
+  for (i in seq_len(num_pars)) {
+    file_path <- file.path(path, paste0("sim_varBD_pars", i, ".trees"))
+    if (file.exists(file_path)) {
+      trees <- read.tree(file_path)
+      trees <- lapply(trees, identity)  # Ensure trees is a list even if there's only one tree in the file
+      
+      # Fill the list up to n_trees with -1 if necessary
+      sim_BDtrees_binary[[i]] <- c(trees, rep(list(-1), n_trees - length(trees)))
+    } else {
+      # If file doesn't exist, fill with -1
+      sim_BDtrees_binary[[i]] <- rep(list(-1), n_trees)
+    }
+  }
+  
+  return(sim_BDtrees_binary)
+}
+
+sim_BDtrees_binary <- reload_sim_BDtrees("../../simulations_output/3-varBD/trees", nrow(BD_rtt), n_trees)
 ```
 
 ```{r warning=FALSE}
@@ -172,6 +182,17 @@ trees_stairs2 <- sapply(sim_BDtrees_binary, sapply, function(result){
 trees_stairs2
 ```
 
+```{r warning=FALSE}
+trees_beta <- sapply(sim_BDtrees_binary, sapply, function(result){
+  if (is.numeric(result)){
+    return(NaN)
+  }else{
+    return(treestats::beta_statistic(result))
+  }
+  })
+trees_beta
+```
+
 ```{r}
 simul_infer <- read.csv("../../simulations_output/1-PBD/all_simulations_inference.csv", row.names = 1)
 
@@ -180,6 +201,7 @@ trees_stats <- data.frame(param_vary = rep(rep(1:5, each=5), n_trees),
                           replicate = rep(0:(n_trees-1), each=length(BD_rtt)),
                           gamma = as.numeric(t(trees_gammma)),
                           stairs2 = as.numeric(t(trees_stairs2)),
+                          beta = as.numeric(t(trees_beta)),
                           SR = as.integer(t(Ntips)))
 trees_stats
 write.csv(trees_stats, "../../simulations_output/3-varBD/simulated_varBD_trees_stats.csv")
