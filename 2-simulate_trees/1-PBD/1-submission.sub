@@ -1,7 +1,9 @@
+tempProcess = $(Process) + 200
+newProcess = $INT(tempProcess)
 executable = /users/biodiv/pveron/PBD_analog/1-wrapper.sh
-arguments = $(Process) /data/biodiv/pveron/PBD_analog/out
-output = /data/biodiv/pveron/PBD_analog/out/$(Cluster).$(Process).stdout
-error = /data/biodiv/pveron/PBD_analog/out/$(Cluster).$(Process).error
+arguments = $(newProcess) /data/biodiv/pveron/PBD_analog/out
+output = /data/biodiv/pveron/PBD_analog/out/$(Cluster).$(newProcess).stdout
+error = /data/biodiv/pveron/PBD_analog/out/$(Cluster).$(newProcess).error
 log = /data/biodiv/pveron/PBD_analog/out/$(Cluster).log
 
 request_cpus = 1
@@ -9,4 +11,4 @@ request_memory = 5G
 
 accounting_group = LongJob.Weekly
 
-queue 200
+queue 300
