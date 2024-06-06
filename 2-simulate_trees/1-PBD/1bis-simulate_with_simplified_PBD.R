@@ -16,22 +16,27 @@ outdir <- args_input[2]
 library(PBD)
 library(ape)
 
-
-# Setting the default parameters (lambda_1=lambda3, lambda2, mu1=mu2)
-param_default <- c(0.5, 1.0, 0.4) # simplified PBD parameters 
-param_n <- 5 # Number of values tested for each parameter
-param_ranges <- list( # All values tested for each parameter
-  10^(seq(from = -0.9, to = 0.3, length.out = param_n)),
-  10^(seq(from = -1, to = 1, length.out = param_n)),
-  10^(seq(from = -1.5, to = 0.5, length.out = param_n))
-)
-
-age <- 15 # Duration simulations
-
 i_tree <- as.numeric(args_input[1])
 print(i_tree)
 set.seed(91 + 6 * i_tree)
 
+age <- 15 # Duration simulations
+
+# Setting the default parameters (lambda_1=lambda3, lambda2, mu1=mu2)
+param_default <- c(0.5, 1.0, 0.2) # simplified PBD parameters 
+param_n <- 5 # Number of values tested for each parameter
+param_ranges <- list( # All values tested for each parameter
+  10^(seq(from = -0.2, to = 0.2, length.out = param_n)),
+  10^(seq(from = -1, to = 1, length.out = param_n)),
+  10^(seq(from = -1.2, to = 0.4, length.out = param_n))
+)
+
+# Approximate the expected tree size to choose appropriate ranges
+#expected_N <- function(pars) ceiling(exp((min(pars[1],pars[2])-pars[3])*age))
+#par(mfrow=c(1,3)) ; 
+#plot(apply(cbind(param_default[1]*param_ranges[[1]], param_default[2], param_default[3]), 1, expected_N), log="y", type="b") ; 
+#plot(apply(cbind(param_default[1], param_default[2]*param_ranges[[2]], param_default[3]), 1, expected_N), log="y", type="b") ; 
+#plot(apply(cbind(param_default[1], param_default[2], param_default[3]*param_ranges[[3]]), 1, expected_N), log="y", type="b")
 
 # Simulation and inference 
 simul_infer <- lapply(1:length(param_default), function(i_param) {

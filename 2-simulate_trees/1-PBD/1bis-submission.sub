@@ -10,4 +10,4 @@ request_memory = 5G
 
 accounting_group = ShortJob
 
-queue 10
+queue 2
