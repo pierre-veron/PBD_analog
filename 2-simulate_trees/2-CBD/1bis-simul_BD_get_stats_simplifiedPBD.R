@@ -3,7 +3,7 @@ library(treestats)
 library(TreeSim)
 
 #setwd("C:\Users\pveron\Documents\GitHub\PBD_analog")
-setwd("Users/Jeremy/Nextcloud/Recherche/1_Methods/PBD_analog")
+#setwd("Users/Jeremy/Nextcloud/Recherche/1_Methods/PBD_analog")
 
 set.seed(394)
 
@@ -30,6 +30,7 @@ equivalent_bd_rates <- function(param) {
 simul_infer <- read.csv("simulations_output/1-PBD/all_simulations_inference_simplified_PBD.csv")
 param_PBD_names <-  paste0("PBD.", c("l1", "l2", "l3", "mu1", "mu2"))
 sim_pars <- simul_infer[simul_infer$replicate==0, c("param_vary", "i_param_var", param_PBD_names)]
+write.csv(sim_pars, "2-simulate_trees/3-varBD/sim_parameters_simplified.csv")
 
 # Case of simulations where only one parameter varies
 #if ("param_vary" %in% colnames(simul_infer)) {
@@ -100,7 +101,6 @@ trees_stats <- data.frame(param_vary = rep(rep(1:n_par, each=n_val), n_trees),
                           SR = as.integer(t(Ntips)))
 
 write.csv(trees_stats, "simulations_output/2-CBD/simulated_BD_trees_stats_simplified_PBD.csv")
-write.csv(sim_pars, "2-simulate_trees/3-varBD/sim_parameters_simplified.csv")
 
 for (i in 1:length(trees)){
   trees_nonNull <- Filter(Negate(is.null), trees[[i]])
