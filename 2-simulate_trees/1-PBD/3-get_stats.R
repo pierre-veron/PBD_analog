@@ -4,7 +4,7 @@ library(phylobase)
 library(adephylo)
 library(treestats)
 
-setwd("C:/Users/pveron/Documents/GitHub/PBD_analog")
+#setwd("C:/Users/pveron/Documents/GitHub/PBD_analog")
 
 n_par <- 5
 n_val <- 5
@@ -22,6 +22,7 @@ list_out <- lapply(1:n_par, function(i_par) {
         "replicate" = i_rep, 
         "gamma" = ape::gammaStat(tree),
         "stairs2" = treestats::stairs2(tree),
+        "beta" = treestats::beta_statistic(tree),
         "SR" = length(tree$tip.label))
     }))
     out

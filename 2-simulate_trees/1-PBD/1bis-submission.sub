@@ -1,0 +1,13 @@
+executable = /data/biodiv/andreole/PBD_analog/2-simulate_trees/1-PBD/1bis-wrapper.sh
+arguments = $(Process) /data/biodiv/andreole/PBD_analog/simulations_output/1-PBD/trees_simplified
+
+output = /data/biodiv/andreole/PBD_analog/simulations_output/1-PBD/trees_simplified/$(Cluster).$(Process).stdout
+error = /data/biodiv/andreole/PBD_analog/simulations_output/1-PBD/trees_simplified/$(Cluster).$(Process).error
+log = /data/biodiv/andreole/PBD_analog/simulations_output/1-PBD/trees_simplified/$(Cluster).log
+
+request_cpus = 1
+request_memory = 5G
+
+accounting_group = ShortJob
+
+queue 2
