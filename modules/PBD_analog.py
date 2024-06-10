@@ -85,7 +85,7 @@ def approx_expected_T(l1, l2, l3, m1, m2, branch_at_initiation = False):
         return 1/((1-pi(l1, l2, l3, m1, m2)) * l1 + m1)
     return 1/((1-pi(l1, l2, l3, m1, m2)) * l1 + m1) + tau(l1, l2, l3, m1, m2)
 
-def analog_BD_rates(l1, l2, l3, m1, m2, branch_at_initiation = False):
+def analog_BD_rates(l1, l2, l3, m1, m2, branch_at_initiation = True):
     p_speciation_ = p_speciation(l1, l2, l3, m1, m2)
     approx_expected_T_ = approx_expected_T(l1, l2, l3, m1, m2, branch_at_initiation)
     spe_rate_ = p_speciation_ / approx_expected_T_
