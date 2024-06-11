@@ -92,6 +92,88 @@ def analog_BD_rates(l1, l2, l3, m1, m2, branch_at_initiation = True):
     ext_rate_ = (1-p_speciation_) / approx_expected_T_
     return spe_rate_, ext_rate_
 
+# partial derivative of the function analog_BD_rates
+def partial_birth_l1(l1, l2, l3, m1, m2):
+    return 1 - pi(l1,l2,l3,m1,m2)
+
+def partial_pi_l2(l1,l2,l3,m1,m2):
+    Lambda = l2+l3+m2
+    return pi(l1,l2,l3,m1,m2)/Lambda - 2*m2 / (Lambda*np.sqrt(Lambda**2 - 4*l3*m2))
+
+def partial_birth_l2(b,l2,l3,m1,m2):
+    return -b*partial_pi_l2(b,l2,l3,m1,m2)
+
+def partial_pi_l3(b,l2,l3,m1,m2):
+    Lambda = l2 + l3 + m2
+    s = np.sqrt(1 - 4 * l3*m2 / (Lambda**2))
+    return -0.5*(l2+m2)/l3**2 * (1-s) + m2 * (l2 + m2 - l3) / (Lambda**2 * l3 * s)
+
+def partial_birth_l3(b, l2,l3,m1,m2):
+    return -b * partial_pi_l3(b,l2,l3,m1,m2)
+
+def partial_pi_m2(b,l2,l3,m1,m2):
+    Lambda = l2 + l3 + m2
+    s = np.sqrt(1 - 4 * l3*m2 / (Lambda**2))
+    return (1-s)/(2*l3) - (m2-l3-l2)/(Lambda**2 * s)
+
+def partial_birth_m2(l1,l2,l3,m1,m2):
+    return -l1*partial_pi_m2(l1,l2,l3,m1,m2)
+
+def partial_birth_m1(l1, l2, l3, m1, m2):
+    return 0.0
+
+def jacobian_analog_bd(i_bd, i_pbd, l1, l2, l3, m1, m2):
+    """ Calculates the partial derivatives of the equivalent constant time
+    birth rate with respect to the PBD parameter. 
+
+    Args:
+        i_bd (int, 0 or 1): 0 for birth rate, 1 for death rate
+        i_pbd (int between 0 and 4): variable with respect to which to calculate 
+           the derivative (0 for l1, 1 for l2, 2 for l3, 3 for m1, 4 for m2)
+        l1, l2, l3, m1, m2 (float): parameters of the PBD model
+
+    Returns:
+        float or array: value of the partial derivative of the equivalent birth 
+           (i_bd = 0) or death (i_bd = 1) with respect to l1, l2, l3, m1 or m2 
+           (depending on i_pbd) evaluated in the parameters l1,l2,l3,m1 and m2
+           passed in arguments.
+    """
+    if i_bd == 0:
+        partial_der = [partial_birth_l1, partial_birth_l2, partial_birth_l3, 
+                        partial_birth_m1, partial_birth_m2]
+        return partial_der[i_pbd](l1, l2, l3, m1, m2)
+    elif i_bd == 1:
+        if i_pbd == 3:
+            return 1.0
+        elif i_pbd in (0,1,2,4):
+            return 0.0
+    raise ValueError("i_bd must be 0 or 1 and i_pbd must be in [0,1,2,3,4].")
+
+def simp_jacobian_analog_bd(i_bd, i_simp_pbd, b, l2, e):
+    """Calculates the partial derivatives of the equivalent constant time
+    birth rate with respect to the PBD parameter in the simplified framework 
+    where l1 = l3 =: b and m1 = m2 =: e. 
+
+    Args:
+        i_bd (int, 0 or 1): 0 for birth rate, 1 for death rate
+        i_simp_pbd (int 0 or 1 or 2): variable with respect to which to calculate 
+           the derivative (0 for b, 1 for l2, 3 for e)
+        b, l2, e (float): parameters of the simplified PBD model
+
+    Returns:
+        float or array: value of the partial derivative of the equivalent birth 
+           (i_bd = 0) or death (i_bd = 1) with respect to b or l2 or e 
+           (depending on i_pbd) evaluated in the parameters b, l2 and e passed 
+           in arguments.
+    """
+    corres_simp = [[0,2], # i_simp_pbd = 0 --> l1 and l3
+                   [1],   # i_simp_pbd = 1 --> l2
+                   [3,4]]  # i_simp_pbd = 2 --> m1 and m2
+    if i_simp_pbd in [0,1,2]:
+        return np.sum([jacobian_analog_bd(i_bd, i_pbd, b, l2, b, e, e) for i_pbd in corres_simp[i_simp_pbd]])
+
+    raise ValueError("i_bd must be 0 or 1 and i_simp_pbd must be in [0,1,2].")
+
 # ---- Time-dependant BD rates ---- #
 
 # Numerically calculate the probabilities of extinction/completion/speciation
