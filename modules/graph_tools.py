@@ -2,6 +2,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
+def name_plot_corner(ax, text, weight = "bold", size = "x-large", x = 0.02, 
+                     y = 0.92, **txtkwargs):
+    """Add a name in the corner of a plot.
+
+    Args:
+        ax (matplotlib Axes object): ax on which to plot the text 
+        text (str): text to plot
+        weight (str, optional): weight of the text. Defaults to "bold".
+        size (str, optional): size of the text. Defaults to "x-large".
+        x (float, optional): position of the text. Defaults to 0.02.
+        y (float, optional): position of the text. Defaults to 0.92.
+    Notes:
+        positions of the text are in axis coordinates (not in data coordinates).
+    """
+    ax.text(x = x, y = y, s = text, weight = weight, 
+             size = size, transform = ax.transAxes, **txtkwargs)
 
 def mix_color(c1,c2,c3,u1,u2,u3, geom = True):
     """ Mixes 3 RGB color according to weights.
