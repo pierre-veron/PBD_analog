@@ -32,11 +32,11 @@ param_ranges <- list( # All values tested for each parameter
 )
 
 # Approximate the expected tree size to choose appropriate ranges
-#expected_N <- function(pars) ceiling(exp((min(pars[1],pars[2])-pars[3])*age))
-#par(mfrow=c(1,3)) ; 
-#plot(apply(cbind(param_default[1]*param_ranges[[1]], param_default[2], param_default[3]), 1, expected_N), log="y", type="b") ; 
-#plot(apply(cbind(param_default[1], param_default[2]*param_ranges[[2]], param_default[3]), 1, expected_N), log="y", type="b") ; 
-#plot(apply(cbind(param_default[1], param_default[2], param_default[3]*param_ranges[[3]]), 1, expected_N), log="y", type="b")
+expected_N <- function(pars) ceiling(exp((min(pars[1],pars[2])-pars[3])*age))
+par(mfrow=c(1,3)) ; 
+plot(apply(cbind(param_default[1]*param_ranges[[1]], param_default[2], param_default[3]), 1, expected_N), log="y", type="b") ; 
+plot(apply(cbind(param_default[1], param_default[2]*param_ranges[[2]], param_default[3]), 1, expected_N), log="y", type="b") ; 
+plot(apply(cbind(param_default[1], param_default[2], param_default[3]*param_ranges[[3]]), 1, expected_N), log="y", type="b")
 
 # Simulation and inference 
 simul_infer <- lapply(1:length(param_default), function(i_param) {

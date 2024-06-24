@@ -1,0 +1,13 @@
+executable = /usr/bin/Rscript
+arguments = 4-fit_BD_truncated_PBD_trees/1-fit_truncated_PBD_trees.R $(par_row)
+
+output = /data/biodiv/andreole/PBD_analog/simulations_output/4-Truncated_PBD/Logs/$(Cluster).$(Process).stdout
+error = /data/biodiv/andreole/PBD_analog/simulations_output/4-Truncated_PBD/Logs/$(Cluster).$(Process).error
+log = /data/biodiv/andreole/PBD_analog/simulations_output/4-Truncated_PBD/Logs/$(Cluster).log
+
+request_cpus = 1
+request_memory = 1G
+
+accounting_group = LongJob.Weekly
+
+queue par_row from seq 5001 1 12500|
