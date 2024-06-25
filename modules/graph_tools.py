@@ -80,14 +80,16 @@ def color_scale_triangle(ax, col1, col2, col3, geom = True):
 
     x = np.linspace(-xtri-0.25, xtri + 0.25, 300)
     y = np.linspace(-0.25, ytri + 0.25, 300)
-    captionmat = np.ones((len(y), len(x), 3))
+    captionmat = np.ones((len(y), len(x), 4)) # RGB - alpha
+    captionmat[:,:,3] = 0.0
     for j in range(len(y)):
         yy = y[j]
         if yy>0 and yy <= 1:
             for i in range(len(x)):
                 xx = x[i]
                 if yy <= ytri - np.abs(xx)*ytri/xtri:
-                    captionmat[j,i,:] = color_by_distance(xx, yy, xtri, ytri, col1, col2, col3, geom)
+                    captionmat[j,i,:3] = color_by_distance(xx, yy, xtri, ytri, col1, col2, col3, geom)
+                    captionmat[j,i,3] = 1.0 # opaque
 
     ax.pcolormesh(x, y, captionmat, rasterized = True)
     plot_grad_line(ax, -xtri, 0, xtri, 0, 6)
