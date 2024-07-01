@@ -13,7 +13,8 @@ with
 $\pi = \frac{\lambda_2 + \lambda_3 + \mu_2}{2\lambda_3} \left(  1 - \sqrt{ 1 - 4\frac{\lambda_3 \mu_2}{(\lambda_2 + \lambda_3 + \mu_2)^2}}  \right)$. 
 
 ## File 
-* `1-simul_BD_get_gamma.R`: simulate the BD process and calculate the gamma statistics.
+* `1-simul_BD_get_stats.R`: simulate the BD process and calculate the statistics.
+* `1bis_simul_BD_get_stats_simplifiedPBD`: same but with simplified PBD parameters (with $b:= \lambda_1 = \lambda_3$ and $e:=\mu_1=\mu_2$).
 
 ## Output 
 The generated trees and statistics are stored in 

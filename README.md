@@ -32,6 +32,22 @@ import matplotlib.pyplot as plt
 plt.style.use("customstyle.mplstyle")
 ```
 
+This repository contains the scripts used to generate all the figures in the manuscript. 
+| Figure     | File name     | Script to generate |
+| ------------- | ------------- | --------------| 
+| 1 | `illustrations/schema_horizon.pdf` | `illustrations/schema_horizon.svg` |
+| 2 | `illustrations/schema_probas.pdf` | `illustrations/schema_probas.svg` |
+| 3 | `fig/PBD_time_dep_rates.pdf` | `1-rates_analysis/1-calculate_probas_rates.ipynb` |
+| 4 | `fig/simp_influence_parameters.pdf`  | `1-rates_analysis/4-influence_params_simplifiedPBD.ipynb` | 
+| 5 | `fig/statistics_tree.pdf` | `3-compare_PBD_BD_varBD/1-compare_stats.ipynb` | 
+| S1 | `fig/SM_probabilities_vs_simulations.pdf` | `1-rates_analysis/1-calculate_probas_rates.ipynb` | 
+| S2 | `fig/SM_time_dep_rates_initiation.pdf` | `1-rates_analysis/1-calculate_probas_rates.ipynb`|
+| S3 | `fig/SM_time_dep_rates_extinction.pdf` | `1-rates_analysis/1-calculate_probas_rates.ipynb`|
+| S4 | `fig/SM_time_dep_rates_comparison_simplified_PBD.pdf` | `2-simulate_trees/3-varBD/1-predict_variable_BD_rates.ipynb` | 
+| S5 | `fig/SM_relative_influence_el2.pdf` and `fig/SM_relative_influence_bl2.pdf` | `1-rates_analysis/4-influence_params_simplifiedPBD.ipynb` | 
+| S6 | `fig/SM_relative_influence_l1l2.pdf`,  `fig/SM_relative_influence_m2l2.pdf` and `fig/influence_parameters.pdf` | `1-rates_analysis/3-influence_params.ipynb` | 
+| S7 | `SM_truncation_lambda.pdf` and `SM_truncation_lambda.pdf` | `4-fit_BD_truncated_PBD_trees\3-plot_comparison.R` |
+
 ## Contact
 * [Pierre Veron](https://www.ese.universite-paris-saclay.fr/en/team-members/pierre-veron/) (`pierre.veron.2017@polytechnique.org`)
 * Jérémy Andréoletti

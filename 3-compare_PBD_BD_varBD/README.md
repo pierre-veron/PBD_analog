@@ -5,3 +5,4 @@
 ```
 
 ## Overview
+This script compares the trees generated under the three processes (PBD, CBD and varBD) with equivalent BD rates. 
