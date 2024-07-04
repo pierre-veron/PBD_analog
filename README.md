@@ -8,6 +8,8 @@
 # Title
 A theoretical framework linking the birth-death and protracted birth-death models, with implications for the phylogenetic analysis of diversification. 
 
+**Preprint:**
+Veron, P., Andréoletti, J., Giraud, T. & Morlon, H. (2024). _BioRxiv_. DOI: [10.1101/2024.07.01.601000](https://doi.org/10.1101/2024.07.01.601000)
 # Overview
 Calculation of equivalent birth and death rates under the protracted birth death models.
 
