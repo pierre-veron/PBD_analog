@@ -496,3 +496,39 @@ def fixedZero_PBD_to_varBD(T, l1, l2, l3, m1, m2, solver_method = "BDF",
     if smooth_convergence:
         rates = constant_after_conv(rates, **conv_crit)
     return np.flip(rates[0,:]), np.flip(rates[1,:]) # flip to have the present = last value
+
+def pulled_spec_rate(time, birth, death, **solver_kwargs):
+    """ Calculate Pulled speciation rate based on speciation and extinction 
+    rates, following Louca and Pennell, Nature, 2020 ; i.e. the speciation 
+    rate of a pure-birth time-dependant rate that is strictly equivalent to 
+    a time-dependant BD process.
+
+    Reference: Louca and Pennell (2020). Extant timetrees are consistent with 
+        a myriad of diversification histories. Nature, 580(7804), 502-505. 
+        https://doi.org/10.1038/s41586-020-2176-1
+ 
+
+    Args:
+        time (array): forward time values, must be sorted (0 = past, T[-1] = present)
+        birth (array): forward time birth rate values, same size as time
+        death (array): forward time death rate values, same size as time
+        **solver_kwargs: other kwargs passed to the ODE solver, 
+           in particular relative and absolute tolerances. Consider reducing these 
+           tolerances to avoid numerical instabilities. 
+
+    Returns:
+        array: pulled speciation rate (lambda_p in L&P 2020)
+    """
+    # flipping the arrays (backward time)
+    time_back = time.copy()
+    birth_back, death_back = np.flip(birth), np.flip(death)
+    # defining birth and death as function
+    l = lambda tau : np.interp(tau, time_back, birth_back)
+    m = lambda tau : np.interp(tau, time_back, death_back)
+    # E is the fraction of lineages extant at age tau that will be missing from the timetree 
+    ode_E = lambda tau, y : m(tau) * (1-y) + l(tau) * (-y+y**2) #L&P 2020, Sup.mat. Eq. 4
+    E_sol = scipy.integrate.solve_ivp(fun = ode_E, t_span = (time[0], time[-1]), y0 = [0.0], **solver_kwargs)
+    E_back = np.interp(time_back, E_sol['t'], E_sol['y'][0])
+    # flipping again to have forward time
+    E_forward = np.flip(E_back)
+    return -birth * (E_forward-1.0) # L&P 2020, Sup.mat. Eq.7
