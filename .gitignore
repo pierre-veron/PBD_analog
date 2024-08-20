@@ -5,7 +5,9 @@ PBDD_bayesian_fit_BDD/datasets_PBDD/
 .ipynb_checkpoints
 simulations_output/1-PBD/trees/
 simulations_output/2-CBD/trees/
+simulations_output/3-varBD/trees/
 simulations_output/1-PBD/trees_simplified
 simulations_output/2-CBD/trees_simplified
 simulations_output/3-VarBD/trees_simplified
 simulations_output/4-Truncated_PBD/Fits
+**/trees/DR/*.csv
