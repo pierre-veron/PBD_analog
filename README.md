@@ -1,4 +1,6 @@
-<a href="https://doi.org/10.5281/zenodo.14001155"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.14001155.svg" alt="DOI"></a>
+![Static Badge](https://img.shields.io/badge/DOI%3A%2010.5281%2Fzenodo.14001155%20-%20?style=flat&logo=zenodo&logoColor=%23FFFFFF&logoSize=auto&labelColor=%23060AC0&color=%23636363&link=https%3A%2F%2Fdoi.org%2F10.5281%2Fzenodo.14001155)
+![Static Badge](https://img.shields.io/badge/Open%20access%20publication%20-%20publication?style=flat&logo=openaccess&logoColor=%23000000&link=https%3A%2F%2Fdoi.org%2F10.1098%2Frstb.2023.0317)
+
 
 # Table of contents 
 * [Title](#title)
@@ -10,8 +12,8 @@
 # Title
 Speciation completion rates have limited impact on macroevolutionary diversification
 
-**Preprint:**
-Veron, P., Andréoletti, J., Giraud, T. & Morlon, H. (2024). _BioRxiv_. DOI: [10.1101/2024.07.01.601000](https://doi.org/10.1101/2024.07.01.601000)
+
+Veron, P., Andréoletti, J., Giraud, T. & Morlon, H. (2025). _Phil. Trans. R. Soc. B_ **380**, 20230317. DOI: [10.1098/rstb.2023.0317](https://doi.org/10.1098/rstb.2023.0317)
 # Overview
 Calculation of equivalent birth and death rates under the protracted birth death models.
 
