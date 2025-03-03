@@ -1,5 +1,6 @@
-![Static Badge](https://img.shields.io/badge/DOI%3A%2010.5281%2Fzenodo.14001155%20-%20?style=flat&logo=zenodo&logoColor=%23FFFFFF&logoSize=auto&labelColor=%23060AC0&color=%23636363&link=https%3A%2F%2Fdoi.org%2F10.5281%2Fzenodo.14001155)
-![Static Badge](https://img.shields.io/badge/Open%20access%20publication%20-%20publication?style=flat&logo=openaccess&logoColor=%23000000&link=https%3A%2F%2Fdoi.org%2F10.1098%2Frstb.2023.0317)
+<img alt="Zenodo available at https://doi.org/10.5281/zenodo.14001155" src="https://img.shields.io/badge/DOI%3A%2010.5281%2Fzenodo.14001155%20-%20?style=flat&logo=zenodo&logoColor=%23FFFFFF&logoSize=auto&labelColor=%23060AC0&color=%23636363&link=https%3A%2F%2Fdoi.org%2F10.5281%2Fzenodo.14001155">
+<img alt="Open access publication" src="https://img.shields.io/badge/%20-%20Open%20access%20publication%20-%20?style=flat&logo=openaccess&logoColor=%23000000&logoSize=auto&labelColor=%2304C20D&color=%23636363&link=https%3A%2F%2Fdoi.org%2F10.1098%2Frstb.2023.0317">
+
 
 
 # Table of contents 
